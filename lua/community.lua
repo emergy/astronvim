@@ -22,7 +22,7 @@ return {
       },
     },
   },
-  -- { import = "astrocommunity.pack.python" },
+  { import = "astrocommunity.pack.python" },
   { import = "astrocommunity.pack.ansible" },
   { import = "astrocommunity.pack.lua" },
   { import = "astrocommunity.pack.docker" },
