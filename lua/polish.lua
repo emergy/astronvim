@@ -17,6 +17,31 @@
 --   },
 -- }
 
+vim.filetype.add {
+  filename = {
+    ["devcontainer.json"] = "json5",
+  },
+}
+
+vim.filetype.add {
+  pattern = {
+    [".*%.yml"] = "yaml.ansible", -- .yml файлы будут определяться как Ansible
+    [".*%.yaml"] = "yaml", -- .yaml файлы как обычный YAML
+  },
+}
+
+-- vim.cmd [[autocmd BufRead,BufNewFile **/ansible-ng/**/*.yml set filetype=yaml.ansible]]
+-- vim.cmd [[autocmd BufRead,BufNewFile **/.devcontainer/*.json set filetype=json5]]
+--
+-- -- Удобная справка справа (:help)
+-- vim.cmd [[
+--   autocmd FileType help wincmd L
+--   autocmd FileType help wincmd 82|
+-- ]]
+
+-- Минимальное количество строк на экране, которые нужно сохранять выше и ниже курсора
+-- vim.opt.scrolloff = 10
+
 -- https://github.com/neovim/neovim/discussions/28010
 -- if vim.env.SSH_CONNECTION ~= nil or vim.env.WEZTERM_EXECUTABLE ~= nil then
 --   vim.o.clipboard = "unnamedplus"

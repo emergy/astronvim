@@ -33,4 +33,52 @@ return {
   { import = "astrocommunity.pack.markdown" },
   { import = "astrocommunity.pack.typescript" },
   { import = "astrocommunity.remote-development.remote-sshfs-nvim" },
+  { import = "astrocommunity.utility.lua-json5" },
+  { import = "astrocommunity.recipes.telescope-nvchad-theme" },
+  { import = "astrocommunity.pack.terraform" },
+  -- {
+  --   import = "astrocommunity.snippet.nvim-snippets",
+  --   opts = {
+  --     search_paths = {
+  --       vim.fn.stdpath "config" .. "/snippets",
+  --     },
+  --     keys = {
+  --       {
+  --         "<Tab>",
+  --         function()
+  --           if vim.snippet.active { direction = 1 } then
+  --             vim.schedule(function() vim.snippet.jump(1) end)
+  --             return
+  --           end
+  --           return "<Tab>"
+  --         end,
+  --         expr = true,
+  --         silent = true,
+  --         mode = "i",
+  --       },
+  --       {
+  --         "<Tab>",
+  --         function()
+  --           vim.schedule(function() vim.snippet.jump(1) end)
+  --         end,
+  --         expr = true,
+  --         silent = true,
+  --         mode = "s",
+  --       },
+  --       {
+  --         "<S-Tab>",
+  --         function()
+  --           if vim.snippet.active { direction = -1 } then
+  --             vim.schedule(function() vim.snippet.jump(-1) end)
+  --             return
+  --           end
+  --           return "<S-Tab>"
+  --         end,
+  --         expr = true,
+  --         silent = true,
+  --         mode = { "i", "s" },
+  --       },
+  --     },
+  --   },
+  -- },
 }
