@@ -43,7 +43,10 @@ return {
       -- В AstroNvim корректнее повесить на VeryLazy:
       vim.api.nvim_create_autocmd("User", {
         pattern = "VeryLazy",
-        callback = function() require("langmapper").automapping { global = true, buffer = true } end,
+        callback = function()
+          require("langmapper").automapping { global = true, buffer = true }
+          pcall(vim.keymap.del, "n", "/") -- вернуть / под поиск
+        end,
       })
     end,
   },

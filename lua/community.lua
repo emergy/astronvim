@@ -19,6 +19,10 @@ return {
   {
     "copilot.lua",
     opts = {
+      filetypes = {
+        yaml = true,
+        markdown = true,
+      },
       suggestion = {
         keymap = {
           accept = "<M-k>",
