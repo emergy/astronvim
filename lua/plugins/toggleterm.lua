@@ -16,6 +16,7 @@ return {
     },
   },
   opts = function(_, opts)
+    opts.size = 20
     opts.auto_scroll = false
     require("terminal_sessions").setup()
     opts.winbar = {
