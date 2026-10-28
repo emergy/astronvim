@@ -109,7 +109,7 @@ return {
         -- mappings seen under group name "Buffer"
         ["<Leader>bb"] = {
           function() require("buffer_menu").open() end,
-          desc = "Выбрать буфер из меню",
+          desc = "Выбрать буфер в Neo-tree",
         },
         ["<Leader>bd"] = {
           function()
