@@ -4,5 +4,9 @@ return {
   ft = { "markdown" },
   cmd = { "RenderMarkdown" },
   dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-mini/mini.icons" },
-  opts = {},
+  opts = {
+    code = {
+      sign = false, -- Значок языка уже есть в заголовке блока кода.
+    },
+  },
 }
