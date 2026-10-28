@@ -107,6 +107,10 @@ return {
         ["[b"] = { function() require("astrocore.buffer").nav(-vim.v.count1) end, desc = "Previous buffer" },
 
         -- mappings seen under group name "Buffer"
+        ["<Leader>bb"] = {
+          function() require("buffer_menu").open() end,
+          desc = "Выбрать буфер из меню",
+        },
         ["<Leader>bd"] = {
           function()
             require("astroui.status.heirline").buffer_picker(
