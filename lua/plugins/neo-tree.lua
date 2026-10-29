@@ -26,6 +26,9 @@ return {
   --   })
   -- end,
   opts = {
+    -- :edit из дерева временно закрывает окно файла при перенаправлении буфера.
+    -- Автовыход в этот момент завершает Neovim до повторного открытия файла.
+    close_if_last_window = false,
     filesystem = {
       filtered_items = {
         visible = true,

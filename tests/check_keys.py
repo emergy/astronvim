@@ -107,6 +107,13 @@ def send(data):
 
 try:
     wait_for(lambda s: s['file'].endswith('file-1.txt') and s['mode']=='n', 'editor ready')
+    send(b' e')
+    wait_for(lambda s: s['ft']=='neo-tree', 'Explorer focused before :edit')
+    send(b':e '+str(artifacts/'file-1.txt').encode()+b'\r')
+    wait_for(lambda s: s['file'].endswith('file-1.txt') and s['ft']!='neo-tree' and s['trees']==1,
+             ':edit existing file from Neo-tree must not exit Neovim')
+    send(b' e')
+    wait_for(lambda s: s['trees']==0 and s['mode']=='n', 'Explorer closes after :edit regression')
     send(b'\x1b[18~')  # F7
     first=wait_for(lambda s: s.get('active')==1 and s['mode']=='t', 'F7 opens terminal')
     send(b'\x1b[19~')  # F8
@@ -152,7 +159,7 @@ try:
     while process.poll() is None and time.monotonic()<end:
         drain()
     assert process.poll()==0, 'clean Neovim exit'
-    print('PASS: real F7/F8 session switching, Alt-z from terminal, Ctrl-Shift-j/k, Alt-Up/Down, raw Ctrl-h/j/k/l passthrough, Space bb + Hop; '+str(artifacts))
+    print('PASS: :edit existing file from Neo-tree, real F7/F8 session switching, Alt-z from terminal, Ctrl-Shift-j/k, Alt-Up/Down, raw Ctrl-h/j/k/l passthrough, Space bb + Hop; '+str(artifacts))
 finally:
     (artifacts/'screen.log').write_bytes(output)
     if process.poll() is None:
