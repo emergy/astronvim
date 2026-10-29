@@ -6,6 +6,7 @@ return {
       config = {
         ansiblels = {
           root_dir = require("lspconfig.util").root_pattern(".ansible-lint", "ansible.cfg", ".git"),
+          settings = { ansible = { ansibleLint = { arguments = "--offline" } } },
         },
       },
     },

@@ -1,0 +1,16 @@
+{
+  "name": "portable-nvim-tools",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Language tools for the native Termux Neovim profile",
+  "engines": { "node": ">=26" },
+  "dependencies": {
+    "@ansible/ansible-language-server": "26.6.0",
+    "bash-language-server": "5.8.1",
+    "basedpyright": "1.40.2",
+    "dockerfile-language-server-nodejs": "0.15.0",
+    "prettier": "3.9.10",
+    "vscode-langservers-extracted": "4.10.0",
+    "yaml-language-server": "2.0.0"
+  }
+}

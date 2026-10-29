@@ -1,0 +1,5 @@
+/.tmp/
+/.backups/
+/.reports/
+/.operation-manifests/
+__pycache__/

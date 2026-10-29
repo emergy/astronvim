@@ -240,3 +240,21 @@ Proxmox. Одного hide_dotfiles=false недостаточно: действ
 - В другом старом процессе Neovim (PID 1306010) всё ещё наблюдался
   `nvim_treesitter#indent()` для YAML. Это отдельная старая конфигурация
   в памяти; новый обработчик намеренно не оборачивает Tree-sitter.
+
+## Общая сборка Linux/Termux (2026-10-29)
+
+- Сохраняется AstroNvim 5 и исходный lazy-lock.json. Профиль определяется
+  в lua/user_platform.lua, изменения инструментов — lua/plugins/portable.lua.
+- На Android отключены Mason и закреплённый Copilot (нет нативного
+  vscode-policy-watcher). Codex работает через Android-бинарник; blink
+  использует Lua. В Linux Mason и Copilot сохранены.
+- Для Neovim 0.12 необходим ранний адаптер Tree-sitter: формат захватов
+  изменился с TSNode на список. Проверены инъекции Markdown и переходы
+  по функциям; файлы установленных плагинов не редактируются.
+- Основные проверки: scripts/check_universal.lua, scripts/check_lsp.lua,
+  scripts/check_render.lua, scripts/check_copilot.lua и tests/check_keys.py.
+  Полные проверки запускать в отдельном процессе с изолированными XDG
+  каталогами и NVIM_UNIVERSAL_TEST=1. Подробности — docs/universal.md.
+- Архивы, снимки буферов и журналы операции хранятся только в исключённых
+  .backups/, .reports/ и .operation-manifests/. На телефоне временные
+  файлы — в согласованном системном $TMPDIR.

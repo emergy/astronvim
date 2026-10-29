@@ -1,34 +1,31 @@
-# AstroNvim Template
+# Neovim для WSL, Linux и Termux
 
-**NOTE:** This is for AstroNvim v5+
+Пользовательская конфигурация на основе [AstroNvim 5](https://github.com/AstroNvim/AstroNvim).
+Общие настройки и сочетания хранятся в одном репозитории; инструменты и бинарные
+библиотеки подбираются для своей платформы.
 
-A template for getting started with [AstroNvim](https://github.com/AstroNvim/AstroNvim)
+Проверяемые окружения: Neovim 0.11.5 в WSL x86-64 и Neovim 0.12.3 в Termux ARM64.
+Профили, зависимости, установка в новый каталог и проверки описаны в
+[docs/universal.md](docs/universal.md).
 
-## 🛠️ Installation
+| Сочетание | Действие |
+|---|---|
+| `Пробел e` | Дерево файлов |
+| `Пробел b b` | Временный выбор буфера в Neo-tree Bufs по метке Hop |
+| `Пробел j` | Переход к видимой строке по метке |
+| `F7` | Показать или скрыть терминал |
+| `F8` | Выбрать терминал; при отсутствии сессий открыть нижний сплит |
+| `Ctrl+h/j/k/l` | Переход между окнами, в том числе из терминала |
+| `Alt+z` | Развернуть текущую панель и вернуть прежнюю раскладку |
+| `Пробел l c` | Панель Codex справа, 33% ширины |
 
-#### Make a backup of your current nvim and shared folder
+Автозапуск Neo-tree отключён; его закомментированный блок сохранён в настройках.
+Расширенная памятка открывается через `Пробел h`.
 
-```shell
-mv ~/.config/nvim ~/.config/nvim.bak
-mv ~/.local/share/nvim ~/.local/share/nvim.bak
-mv ~/.local/state/nvim ~/.local/state/nvim.bak
-mv ~/.cache/nvim ~/.cache/nvim.bak
-```
+В Termux используются Lua-движок blink.cmp и установленные Android-совместимые
+инструменты. Закреплённый сервер GitHub Copilot на Android не поддерживается
+и выключен в этом профиле; в WSL он сохранён.
 
-#### Create a new user repository from this template
-
-Press the "Use this template" button above to create a new repository to store your user configuration.
-
-You can also just clone this repository directly if you do not want to track your user configuration in GitHub.
-
-#### Clone the repository
-
-```shell
-git clone https://github.com/<your_user>/<your_repository> ~/.config/nvim
-```
-
-#### Start Neovim
-
-```shell
-nvim
-```
+Перед заменой существующей сборки сохраняйте конфигурацию, данные, состояние,
+кэши и несохранённые буферы. Локальные резервные копии, отчёты и временные
+каталоги исключены из Git.
