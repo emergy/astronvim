@@ -14,6 +14,9 @@ vim.defer_fn(function()
         local lhs = key == "J" and "<S-NL>" or "<C-S-" .. key .. ">"
         assert(vim.fn.maparg(lhs, mode) ~= "", "shifted navigation: " .. mode .. key)
       end
+      for _, arrow in ipairs { "Left", "Down", "Up", "Right" } do
+        assert(vim.fn.maparg("<M-" .. arrow .. ">", mode) ~= "", "Alt-arrow navigation: " .. mode .. arrow)
+      end
       assert(vim.fn.maparg("<NL>", mode) == "", "newline must not navigate windows")
     end
     local lazy = require "lazy"

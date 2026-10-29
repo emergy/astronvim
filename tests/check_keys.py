@@ -132,6 +132,10 @@ try:
     assert received.exists() and received.read_bytes()==b'\x08\n\x0b\x0c', 'original control keys must reach the terminal'
     send(b'\x1b[107;6u')  # Ctrl-Shift-k
     wait_for(lambda s: s['file'].endswith('file-1.txt') and s['mode']=='n', 'Ctrl-Shift-k returns to editor')
+    send(b'\x1b[1;3B')  # Alt-Down from editor
+    wait_for(lambda s: s.get('active')==2, 'Alt-Down returns to terminal')
+    send(b'\x1b[1;3A')  # Alt-Up from terminal
+    wait_for(lambda s: s['file'].endswith('file-1.txt') and s['mode']=='n', 'Alt-Up returns to editor')
     send(b'\x1b[106;6u')  # Ctrl-Shift-j from editor
     wait_for(lambda s: s.get('active')==2, 'Ctrl-Shift-j returns to terminal')
     send(b'\x1b[107;6u')
@@ -148,7 +152,7 @@ try:
     while process.poll() is None and time.monotonic()<end:
         drain()
     assert process.poll()==0, 'clean Neovim exit'
-    print('PASS: real F7/F8 session switching, Alt-z from terminal, Ctrl-Shift-j/k, raw Ctrl-h/j/k/l passthrough, Space bb + Hop; '+str(artifacts))
+    print('PASS: real F7/F8 session switching, Alt-z from terminal, Ctrl-Shift-j/k, Alt-Up/Down, raw Ctrl-h/j/k/l passthrough, Space bb + Hop; '+str(artifacts))
 finally:
     (artifacts/'screen.log').write_bytes(output)
     if process.poll() is None:

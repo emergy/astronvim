@@ -5,8 +5,9 @@ return {
     -- Ctrl+J совпадает с переводом строки: оставляем его терминальному приложению.
     for _, mode in ipairs { "n", "t" } do
       local maps = opts.mappings[mode]
-      for _, key in ipairs { "H", "J", "K", "L" } do
+      for key, arrow in pairs { H = "Left", J = "Down", K = "Up", L = "Right" } do
         maps["<C-S-" .. key .. ">"] = maps["<C-" .. key .. ">"]
+        maps["<M-" .. arrow .. ">"] = maps["<C-" .. key .. ">"]
         maps["<C-" .. key .. ">"] = false
       end
     end

@@ -79,7 +79,8 @@ list:
 
 ## Терминалы
 
-- Переходы между окнами в Normal и Terminal: Ctrl+Shift+H/J/K/L.
+- Переходы между окнами в Normal и Terminal: Ctrl+Shift+H/J/K/L,
+  с дублями Alt+стрелки.
   Обычные Ctrl+H/J/K/L не перехватываются глобально; Ctrl+J / LF должен
   доходить до приложения терминала (новая строка в Codex).
   Настройка: `lua/plugins/window_navigation.lua`.
