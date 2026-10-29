@@ -20,7 +20,7 @@ state_file = artifacts / 'state.json'
 key_file = artifacts / 'hint.txt'
 (artifacts / 'terminal.py').write_text(
     "import os, tty\nfrom pathlib import Path\ntty.setraw(0)\n"
-    "base=Path(__file__).parent\n(base/'terminal-ready').touch()\n"
+    "base=Path(__file__).parent\nos.write(1, b'history\\r\\n'*2000)\n(base/'terminal-ready').touch()\n"
     "while True:\n with (base/'terminal-input.bin').open('ab', buffering=0) as output: output.write(os.read(0, 1024))\n"
 )
 lua = r'''
@@ -66,7 +66,8 @@ vim.defer_fn(function()
     local state={mode=vim.api.nvim_get_mode().mode,ft=vim.bo.filetype,
       file=vim.api.nvim_buf_get_name(0),window=vim.api.nvim_get_current_win(),
       windows=#vim.api.nvim_list_wins(),trees=trees,active=active,
-      zoom=zen and zen.win and zen.win:valid() or false}
+      zoom=zen and zen.win and zen.win:valid() or false,
+      lines=vim.api.nvim_buf_line_count(0),scrollback=vim.bo.scrollback,job=vim.b.terminal_job_id}
     vim.fn.writefile({vim.json.encode(state)},base..'/state.json')
   end))
   vim.api.nvim_create_autocmd('VimLeavePre',{once=true,callback=function()timer:stop();timer:close()end})
@@ -92,12 +93,18 @@ def drain():
 def wait_for(predicate, message, timeout=12):
     end = time.monotonic() + timeout
     state = {}
+    matching_since = None
     while time.monotonic() < end and process.poll() is None:
         drain()
         try:
             state = json.loads(state_file.read_text())
             if predicate(state):
-                return state
+                if matching_since is None:
+                    matching_since = time.monotonic()
+                elif time.monotonic() - matching_since >= 0.15:
+                    return state
+            else:
+                matching_since = None
         except (FileNotFoundError, json.JSONDecodeError):
             pass
     raise AssertionError(message + ': ' + repr(state))
@@ -112,7 +119,7 @@ try:
     send(b':e '+str(artifacts/'file-1.txt').encode()+b'\r')
     wait_for(lambda s: s['file'].endswith('file-1.txt') and s['ft']!='neo-tree' and s['trees']==1,
              ':edit existing file from Neo-tree must not exit Neovim')
-    send(b' e')
+    send(b':Neotree close\r')
     wait_for(lambda s: s['trees']==0 and s['mode']=='n', 'Explorer closes after :edit regression')
     send(b'\x1b[18~')  # F7
     first=wait_for(lambda s: s.get('active')==1 and s['mode']=='t', 'F7 opens terminal')
@@ -129,14 +136,19 @@ try:
     while not (artifacts/'terminal-ready').exists() and time.monotonic()<end:
         drain()
     assert (artifacts/'terminal-ready').exists(), 'raw terminal ready'
-    send(b'\x08\n\x0b\x0c')  # Ctrl-h/j/k/l, including the Ctrl+Enter newline
+    before_clear=wait_for(lambda s: s.get('active')==2 and s['mode']=='t' and s['lines']>1000, 'terminal history ready')
+    send(b'\x0b\x0b')  # Ctrl-k twice while the asynchronous reset is pending
+    after_clear=wait_for(lambda s: s.get('active')==2 and s['mode']=='t' and s['lines']<100 and s['scrollback']==100000,
+                         'Ctrl-k clears history and restores the limit')
+    assert after_clear['job']==before_clear['job'] and after_clear['window']==before_clear['window'], 'clearing must preserve process and focus'
+    send(b'\x08\n\x0c')  # Ctrl-h/j/l, including the Ctrl+Enter newline
     end=time.monotonic()+5
     received=artifacts/'terminal-input.bin'
     while time.monotonic()<end:
         drain()
-        if received.exists() and received.read_bytes()==b'\x08\n\x0b\x0c':
+        if received.exists() and received.read_bytes()==b'\x08\n\x0c':
             break
-    assert received.exists() and received.read_bytes()==b'\x08\n\x0b\x0c', 'original control keys must reach the terminal'
+    assert received.exists() and received.read_bytes()==b'\x08\n\x0c', 'original control keys must reach the terminal'
     send(b'\x1b[107;6u')  # Ctrl-Shift-k
     wait_for(lambda s: s['file'].endswith('file-1.txt') and s['mode']=='n', 'Ctrl-Shift-k returns to editor')
     send(b'\x1b[1;3B')  # Alt-Down from editor
@@ -159,7 +171,7 @@ try:
     while process.poll() is None and time.monotonic()<end:
         drain()
     assert process.poll()==0, 'clean Neovim exit'
-    print('PASS: :edit existing file from Neo-tree, real F7/F8 session switching, Alt-z from terminal, Ctrl-Shift-j/k, Alt-Up/Down, raw Ctrl-h/j/k/l passthrough, Space bb + Hop; '+str(artifacts))
+    print('PASS: :edit existing file from Neo-tree, real F7/F8 session switching, Alt-z from terminal, Ctrl-Shift-j/k, Alt-Up/Down, Ctrl-k history clear, raw Ctrl-h/j/l passthrough, Space bb + Hop; '+str(artifacts))
 finally:
     (artifacts/'screen.log').write_bytes(output)
     if process.poll() is None:

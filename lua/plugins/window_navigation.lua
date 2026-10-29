@@ -11,5 +11,9 @@ return {
         maps["<C-" .. key .. ">"] = false
       end
     end
+    opts.mappings.t["<C-K>"] = {
+      function() require("terminal_history").clear() end,
+      desc = "Очистить историю терминала",
+    }
   end,
 }
