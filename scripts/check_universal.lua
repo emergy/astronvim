@@ -10,7 +10,9 @@ vim.defer_fn(function()
     assert(vim.fn.maparg("<F8>", "t") ~= "", "terminal picker mapping")
     for _, mode in ipairs { "n", "t" } do
       for _, key in ipairs { "H", "J", "K", "L" } do
-        assert(vim.fn.maparg("<C-S-" .. key .. ">", mode) ~= "", "shifted navigation: " .. mode .. key)
+        -- Neovim канонизирует Ctrl+Shift+J как Shift+NL при регистрации.
+        local lhs = key == "J" and "<S-NL>" or "<C-S-" .. key .. ">"
+        assert(vim.fn.maparg(lhs, mode) ~= "", "shifted navigation: " .. mode .. key)
       end
       assert(vim.fn.maparg("<NL>", mode) == "", "newline must not navigate windows")
     end
