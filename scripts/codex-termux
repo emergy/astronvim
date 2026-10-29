@@ -1,0 +1,3 @@
+#!/system/bin/sh
+# Запуск Android-бинарника из общего набора инструментов Neovim.
+exec "${XDG_DATA_HOME:-$HOME/.local/share}/nvim/tools/bin/codex" "$@"
