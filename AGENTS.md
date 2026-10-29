@@ -79,6 +79,11 @@ list:
 
 ## Терминалы
 
+- Переходы между окнами в Normal и Terminal: Ctrl+Shift+H/J/K/L.
+  Обычные Ctrl+H/J/K/L не перехватываются глобально; Ctrl+J / LF должен
+  доходить до приложения терминала (новая строка в Codex).
+  Настройка: `lua/plugins/window_navigation.lua`.
+
 - Используется ToggleTerm; F8 открывает выбор терминалов через `terminal_sessions`.
 - В `lua/plugins/toggleterm.lua` задано `auto_scroll = false`: принудительный
   переход вниз при каждом выводе отключён. Штатный Neovim следует за выводом,

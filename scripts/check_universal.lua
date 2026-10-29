@@ -8,7 +8,12 @@ vim.defer_fn(function()
     end
     assert(vim.fn.maparg("<M-z>", "t") ~= "", "terminal zoom mapping")
     assert(vim.fn.maparg("<F8>", "t") ~= "", "terminal picker mapping")
-    assert(vim.fn.maparg("<C-k>", "t") ~= "", "terminal navigation mapping")
+    for _, mode in ipairs { "n", "t" } do
+      for _, key in ipairs { "H", "J", "K", "L" } do
+        assert(vim.fn.maparg("<C-S-" .. key .. ">", mode) ~= "", "shifted navigation: " .. mode .. key)
+      end
+      assert(vim.fn.maparg("<NL>", mode) == "", "newline must not navigate windows")
+    end
     local lazy = require "lazy"
     local plugins = require("lazy.core.config").plugins
     local treesitter = require("lazy.core.plugin").values(plugins["nvim-treesitter"], "opts", false)

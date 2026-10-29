@@ -18,6 +18,11 @@ for index in range(1, 4):
     (artifacts / f'file-{index}.txt').write_text(f'file {index}\n')
 state_file = artifacts / 'state.json'
 key_file = artifacts / 'hint.txt'
+(artifacts / 'terminal.py').write_text(
+    "import os, tty\nfrom pathlib import Path\ntty.setraw(0)\n"
+    "base=Path(__file__).parent\n(base/'terminal-ready').touch()\n"
+    "while True:\n with (base/'terminal-input.bin').open('ab', buffering=0) as output: output.write(os.read(0, 1024))\n"
+)
 lua = r'''
 vim.defer_fn(function()
   local base = BASE
@@ -47,7 +52,7 @@ vim.defer_fn(function()
     local terms=package.loaded['toggleterm.terminal']
     local all=terms and terms.get_all() or {}
     if #all==1 and all[1]:is_open() and not second then
-      second=terms.Terminal:new({direction='vertical'});second:spawn()
+      second=terms.Terminal:new({direction='vertical',cmd='python3 '..vim.fn.shellescape(base..'/terminal.py')});second:spawn()
     end
     local active
     for _,term in ipairs(all) do
@@ -113,8 +118,24 @@ try:
     wait_for(lambda s: s['zoom'] and s['mode']=='t', 'Alt-z zoom from terminal mode')
     send(b'\x1bz')
     wait_for(lambda s: not s['zoom'] and s.get('active')==2 and s['mode']=='t', 'Alt-z restores terminal')
-    send(b'\x0b')  # Ctrl-k
-    wait_for(lambda s: s['file'].endswith('file-1.txt') and s['mode']=='n', 'Ctrl-k returns to editor')
+    end=time.monotonic()+5
+    while not (artifacts/'terminal-ready').exists() and time.monotonic()<end:
+        drain()
+    assert (artifacts/'terminal-ready').exists(), 'raw terminal ready'
+    send(b'\x08\n\x0b\x0c')  # Ctrl-h/j/k/l, including the Ctrl+Enter newline
+    end=time.monotonic()+5
+    received=artifacts/'terminal-input.bin'
+    while time.monotonic()<end:
+        drain()
+        if received.exists() and received.read_bytes()==b'\x08\n\x0b\x0c':
+            break
+    assert received.exists() and received.read_bytes()==b'\x08\n\x0b\x0c', 'original control keys must reach the terminal'
+    send(b'\x1b[107;6u')  # Ctrl-Shift-k
+    wait_for(lambda s: s['file'].endswith('file-1.txt') and s['mode']=='n', 'Ctrl-Shift-k returns to editor')
+    send(b'\x1b[106;6u')  # Ctrl-Shift-j from editor
+    wait_for(lambda s: s.get('active')==2, 'Ctrl-Shift-j returns to terminal')
+    send(b'\x1b[107;6u')
+    wait_for(lambda s: s['file'].endswith('file-1.txt') and s['mode']=='n', 'Ctrl-Shift-k returns again')
     send(b' bb')
     end=time.monotonic()+8
     while not key_file.exists() and time.monotonic()<end:
@@ -127,7 +148,7 @@ try:
     while process.poll() is None and time.monotonic()<end:
         drain()
     assert process.poll()==0, 'clean Neovim exit'
-    print('PASS: real F7/F8 session switching, Alt-z from terminal, Ctrl-k, Space bb + Hop; '+str(artifacts))
+    print('PASS: real F7/F8 session switching, Alt-z from terminal, Ctrl-Shift-j/k, raw Ctrl-h/j/k/l passthrough, Space bb + Hop; '+str(artifacts))
 finally:
     (artifacts/'screen.log').write_bytes(output)
     if process.poll() is None:
