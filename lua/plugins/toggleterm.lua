@@ -7,9 +7,7 @@ return {
       "<F8>",
       function()
         vim.cmd.stopinsert()
-        vim.schedule(function()
-          require("terminal_sessions").select()
-        end)
+        vim.schedule(function() require("terminal_sessions").select() end)
       end,
       mode = { "n", "i", "t" },
       desc = "Select terminal or open horizontal terminal",
@@ -21,7 +19,7 @@ return {
     require("terminal_sessions").setup()
     opts.winbar = {
       enabled = true,
-      name_formatter = function(term) return require("terminal_sessions").label(term):gsub("%%", "%%%%") end,
+      name_formatter = function(term) return require("terminal_sessions").label(term, true):gsub("%%", "%%%%") end,
     }
   end,
 }

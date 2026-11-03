@@ -1,43 +1,48 @@
 local M = {}
-local process_names = {}
+local contexts = {}
+local context = require "terminal_context"
 
-local function read_line(path)
-  local file = io.open(path, "r")
-  if not file then return end
-  local line = file:read "*l"
-  file:close()
-  return line
+local function terminals()
+  local loaded = package.loaded["toggleterm.terminal"]
+  return loaded and loaded.get_all() or {}
 end
 
-local function process_name(term)
-  local ok, pid = pcall(vim.fn.jobpid, term.job_id or -1)
-  if not ok or pid <= 0 then return "terminal" end
-  local stat = read_line(("/proc/%d/stat"):format(pid))
-  -- Fields after the parenthesized command start at field 3; tpgid is field 8.
-  local fields = stat and vim.split(stat:match("^%d+ %b() (.*)$") or "", " ", { trimempty = true })
-  local foreground = fields and tonumber(fields[6])
-  return read_line(("/proc/%d/comm"):format(foreground and foreground > 0 and foreground or pid))
-    or vim.fn.fnamemodify(vim.o.shell, ":t")
+function M.label(term, compact)
+  local info = contexts[term.id] or context.inspect(term)
+  return ("%d: %s"):format(term.id, context.format(info, compact))
 end
 
-function M.label(term)
-  local name = process_names[term.id] or process_name(term)
-  return ("%d: %s"):format(term.id, name)
+function M.buffer_label(buf)
+  for _, term in ipairs(terminals()) do
+    if term.bufnr == buf then return M.label(term) end
+  end
+  return context.format(context.inspect { bufnr = buf, job_id = vim.b[buf].terminal_job_id })
+end
+
+function M.title()
+  local buf = vim.api.nvim_get_current_buf()
+  if vim.bo[buf].buftype == "terminal" then return M.buffer_label(buf) .. " " end
+  local name = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(buf), ":t")
+  return (name == "" and "[No Name]" or name) .. " [" .. vim.fn.fnamemodify(vim.fn.getcwd(), ":t") .. "] "
+end
+
+function M.refresh()
+  local updated, changed = {}, false
+  for _, term in ipairs(terminals()) do
+    updated[term.id] = context.inspect(term)
+    if not vim.deep_equal(updated[term.id], contexts[term.id]) then changed = true end
+  end
+  contexts = updated
+  if changed then
+    vim.cmd "redrawstatus!"
+    vim.o.titlestring = vim.o.titlestring
+  end
 end
 
 function M.setup()
   if M.timer then return end
   M.timer = assert((vim.uv or vim.loop).new_timer())
-  M.timer:start(0, 750, vim.schedule_wrap(function()
-    local names = {}
-    local changed = false
-    for _, term in ipairs(require("toggleterm.terminal").get_all()) do
-      names[term.id] = process_name(term)
-      if names[term.id] ~= process_names[term.id] then changed = true end
-    end
-    process_names = names
-    if changed then vim.cmd "redrawstatus!" end
-  end))
+  M.timer:start(0, 750, vim.schedule_wrap(M.refresh))
   vim.api.nvim_create_autocmd("VimLeavePre", {
     once = true,
     callback = function()
@@ -48,6 +53,7 @@ function M.setup()
 end
 
 function M.select()
+  M.refresh()
   local terminals = require("toggleterm.terminal").get_all()
   if #terminals == 0 then
     vim.cmd "ToggleTerm direction=horizontal"
@@ -66,7 +72,21 @@ function M.select()
     end
   end
 
+  local width = 0
+  for _, term in ipairs(terminals) do
+    width = math.max(width, vim.fn.strdisplaywidth(M.label(term)) + 6)
+  end
+  local maximum = math.max(1, vim.o.columns - 4)
   vim.ui.select(terminals, {
+    snacks = {
+      layout = {
+        layout = {
+          width = math.min(maximum, math.max(80, width)),
+          min_width = math.min(80, maximum),
+          max_width = maximum,
+        },
+      },
+    },
     prompt = "Выберите терминал:",
     format_item = M.label,
   }, function(term)

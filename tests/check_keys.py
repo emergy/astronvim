@@ -58,14 +58,15 @@ vim.defer_fn(function()
     for _,term in ipairs(all) do
       if term:is_open() and term.window==vim.api.nvim_get_current_win() then active=term.id end
     end
-    local trees=0
+    local trees,windows=0,0
     for _,win in ipairs(vim.api.nvim_list_wins()) do
+      if vim.api.nvim_win_get_config(win).relative=='' then windows=windows+1 end
       if vim.bo[vim.api.nvim_win_get_buf(win)].filetype=='neo-tree' then trees=trees+1 end
     end
     local zen=package.loaded['snacks.zen']
     local state={mode=vim.api.nvim_get_mode().mode,ft=vim.bo.filetype,
       file=vim.api.nvim_buf_get_name(0),window=vim.api.nvim_get_current_win(),
-      windows=#vim.api.nvim_list_wins(),trees=trees,active=active,
+      windows=windows,trees=trees,active=active,
       zoom=zen and zen.win and zen.win:valid() or false,
       lines=vim.api.nvim_buf_line_count(0),scrollback=vim.bo.scrollback,job=vim.b.terminal_job_id}
     vim.fn.writefile({vim.json.encode(state)},base..'/state.json')
@@ -127,7 +128,7 @@ try:
     wait_for(lambda s: s['ft']=='snacks_picker_input', 'F8 picker from terminal mode')
     send(b'\x1b[B\r')
     second=wait_for(lambda s: s.get('active')==2 and s['mode']=='t', 'F8 switches session')
-    assert first['window']==second['window'] and second['windows']==2, 'F8 must reuse split'
+    assert first['window']==second['window'] and second['windows']==2, 'F8 must reuse split: '+repr((first,second))
     send(b'\x1bz')
     wait_for(lambda s: s['zoom'] and s['mode']=='t', 'Alt-z zoom from terminal mode')
     send(b'\x1bz')

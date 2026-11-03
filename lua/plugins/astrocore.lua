@@ -73,7 +73,7 @@ return {
         --   ──────────────────────────────────  ──────────────────────────────────────────────────────
         --    ""                                  Стандартный заголовок Neovim
         -- titlestring = "%t [%.10{fnamemodify(getcwd(), ':~')}]",
-        titlestring = "%t [%{fnamemodify(getcwd(), ':t')}] ",
+        titlestring = "%{v:lua.require'terminal_sessions'.title()}",
         titlelen = 0, -- keep the full path in the terminal title
 
         -- langmap = table.concat({
