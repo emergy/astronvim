@@ -10,12 +10,14 @@ return {
   end,
   config = function(plugin, opts)
     require("treesitter_compat").setup()
-    require("astronvim.plugins.configs.nvim-treesitter")(plugin, opts)
+    if require("user_platform").termux then require("treesitter_termux").setup() end
+    require "astronvim.plugins.configs.nvim-treesitter"(plugin, opts)
   end,
   opts = function(_, opts)
     opts.indent = opts.indent or {}
     opts.indent.disable = require("astrocore").list_insert_unique(opts.indent.disable, { "yaml" })
-    if require("user_platform").testing then
+    local platform = require "user_platform"
+    if platform.testing then
       opts.auto_install = false
       opts.ensure_installed = {}
     elseif opts.ensure_installed ~= "all" then
