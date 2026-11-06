@@ -48,3 +48,5 @@ vim.g.clipboard = {
 require("neotree_mouse").setup()
 
 require("buffer_mouse").setup()
+
+require("terminal_keys").setup()
