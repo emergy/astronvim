@@ -33,23 +33,27 @@ def normal():return lua('vim.api.nvim_get_mode().mode') in ('n','nt')
 try:
  pump(1.5);assert lua('vim.api.nvim_get_mode().mode')=='t'
  for _ in range(2):
-  key(b'\x1b[1;5D');assert normal()
-  key(b'\x1b[1;5D');assert normal()
-  key(b'\x1b[1;5C');assert lua('vim.api.nvim_get_mode().mode')=='t'
-  key(b'\x1b[1;5C');assert lua('vim.api.nvim_get_mode().mode')=='t'
- print('PASS Ctrl+Left normal, Ctrl+Right terminal, repeated presses safe')
+  key(b'\x1b[1;6D');assert normal()
+  key(b'\x1b[1;6D');assert normal()
+  key(b'\x1b[1;6C');assert lua('vim.api.nvim_get_mode().mode')=='t'
+  key(b'\x1b[1;6C');assert lua('vim.api.nvim_get_mode().mode')=='t'
+ print('PASS Ctrl+Shift+Left normal, Ctrl+Shift+Right terminal, repeated presses safe')
  for startmode in ('t','n'):
-  if startmode=='n':key(b'\x1b[1;5D')
+  if startmode=='n':key(b'\x1b[1;6D')
   hint=base/'hint'
   if hint.exists():hint.unlink()
-  key(b'\x1b[1;5B');assert hint.exists(),'Hop hints were not generated'
+  key(b'\x1b[1;6B');assert hint.exists(),'Hop hints were not generated'
   target=json.loads(hint.read_text());key(target['label'].encode())
   assert normal()
   assert int(lua('vim.api.nvim_win_get_cursor(0)[1]'))==target['row'],target
-  print('PASS Ctrl+Down real Hop line selection from',startmode)
+  print('PASS Ctrl+Shift+Down real Hop line selection from',startmode)
  assert not (base/'input').exists() or (base/'input').read_bytes()==b''
  assert lua('vim.fn.jobwait({job},0)[1]')=='-1'
- key(b'\x1b[1;5C');key(b'probe');assert (base/'input').read_bytes()==b'probe'
+ for arrow in ('Left','Right','Down'):
+  assert lua('vim.fn.maparg("<C-'+arrow+'>","n",false,true).desc')=='Resize split '+arrow.lower()
+  assert lua('vim.fn.maparg("<C-'+arrow+'>","t",false,true).buffer or 0')=='0'
+ print('PASS unshifted Ctrl+arrows keep original terminal and resize behavior')
+ key(b'\x1b[1;6C');key(b'probe');assert (base/'input').read_bytes()==b'probe'
  print('PASS control keys are not sent to process; regular input restored')
  lua('(function() vim.cmd.stopinsert(); vim.api.nvim_set_current_win(editor) end)()');pump()
  assert lua('vim.fn.maparg("<C-Left>","n",false,true).desc')=='Resize split left'

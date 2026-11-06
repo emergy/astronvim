@@ -5,18 +5,18 @@ function M.attach(buf)
   local function map(mode, key, action, desc)
     vim.keymap.set(mode, key, action, { buffer = buf, silent = true, desc = desc })
   end
-  map("t", "<C-Left>", [[<C-\><C-n>]], "Перейти из терминального ввода в Normal mode")
-  map("n", "<C-Left>", "<Nop>", "Оставаться в Normal mode терминала")
-  map({ "n", "t" }, "<C-Right>", "<Cmd>startinsert<CR>", "Вернуться к вводу в терминал")
+  map("t", "<C-S-Left>", [[<C-\><C-n>]], "Перейти из терминального ввода в Normal mode")
+  map("n", "<C-S-Left>", "<Nop>", "Оставаться в Normal mode терминала")
+  map({ "n", "t" }, "<C-S-Right>", "<Cmd>startinsert<CR>", "Вернуться к вводу в терминал")
   map(
     "n",
-    "<C-Down>",
+    "<C-S-Down>",
     function() require("hop").hint_lines { multi_windows = false } end,
     "Выбрать строку по метке"
   )
   map(
     "t",
-    "<C-Down>",
+    "<C-S-Down>",
     [[<C-\><C-n><Cmd>lua require("hop").hint_lines({multi_windows=false})<CR>]],
     "Выбрать строку по метке"
   )
