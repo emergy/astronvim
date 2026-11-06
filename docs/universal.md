@@ -208,3 +208,12 @@ SSH-конфигурация и приватные ключи не читают�
 
 Настройка: `lua/buffer_mouse.lua`, `lua/plugins/heirline.lua`, `lua/polish.lua`.
 Проверка настоящими кликами в отдельном Neovim: `python3 tests/check_buffer_mouse.py`.
+
+## Просмотр истории терминала с клавиатуры
+
+`Ctrl+Space` в терминальном вводе переключает в Normal mode — это короткий
+дубль `Ctrl+\`, затем `Ctrl+n`. После этого работают `PageUp`/`PageDown`,
+`Ctrl+u`/`Ctrl+d`, поиск `/` и выделение. Клавиша `i` возвращает к вводу.
+Сочетание зарезервировано за Neovim и не передаётся приложению терминала.
+В Insert mode редактора `Ctrl+Space` сохраняет вызов автодополнения.
+Настройка: `lua/plugins/window_navigation.lua`.
