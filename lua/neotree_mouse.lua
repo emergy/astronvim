@@ -7,8 +7,7 @@ function M.scroll(key)
     mouse.winid > 0
     and mouse.winid ~= current
     and vim.api.nvim_win_is_valid(mouse.winid)
-    and vim.api.nvim_win_get_config(current).relative == ""
-    and vim.bo[vim.api.nvim_win_get_buf(mouse.winid)].filetype == "neo-tree"
+    and vim.api.nvim_win_get_config(mouse.winid).focusable ~= false
   then
     local mode = vim.api.nvim_get_mode().mode
     if mode == "v" or mode == "V" or mode == "\22" then
@@ -23,13 +22,13 @@ function M.scroll(key)
 end
 
 function M.setup()
-  for _, direction in ipairs { "Up", "Down" } do
+  for _, direction in ipairs { "Up", "Down", "Left", "Right" } do
     local key = "<ScrollWheel" .. direction .. ">"
     vim.keymap.set(
       { "n", "i", "t", "x" },
       key,
       function() M.scroll(key) end,
-      { desc = "Прокрутить панель; активировать Neo-tree под мышью", silent = true }
+      { desc = "Активировать и прокрутить панель под мышью", silent = true }
     )
   end
 end
