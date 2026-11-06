@@ -43,3 +43,6 @@ vim.g.clipboard = {
   -- },
 }
 -- end
+
+-- Первый скролл над Neo-tree активирует дерево до прокрутки, сохраняя позицию при клике.
+require("neotree_mouse").setup()
