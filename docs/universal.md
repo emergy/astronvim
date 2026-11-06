@@ -235,3 +235,28 @@ Ctrl+стрелки в Normal mode сохраняют изменение раз�
 Настройка: `lua/terminal_keys.lua`, подключение из `lua/polish.lua`.
 
 Проверка клавиш настоящим вводом: `python3 tests/check_terminal_arrows.py`.
+
+## Ansible в нативном Termux
+
+На телефоне команды Ansible используют отдельное окружение
+`~/.local/share/ansible-core/2.22.0-py3.13` с `ansible-core==2.22.0`.
+Оно создано через `python3 -m venv --system-site-packages`: используется
+нативная `cryptography` из пакета Termux `python-cryptography`.
+Jinja2, PyYAML и остальные зависимости Ansible установлены в это окружение;
+системный Python и его пакеты не заменяются.
+
+Команды `~/.local/bin/ansible`, `ansible-playbook`, `ansible-vault` и остальные
+точки входа новой версии ссылаются на `bin` этого окружения. Старые команды
+Ansible 2.9 использовали Python 3.11 и перестали находить свой модуль после
+обновления Python телефона до 3.13. Не добавлять старый `site-packages`
+Python 3.11 в `PYTHONPATH` нового Python.
+
+Для проверки достаточно `ansible --version` и `ansible-vault --version`.
+Проверены выполнение локального playbook с `ansible.builtin.ping`, `command`
+и `assert`, а также полный тест `tests/check_ansible_vault.lua` с настоящим CLI.
+Роли и коллекции при восстановлении не устанавливались и не обновлялись.
+Пользовательские playbook и подключения к внешним хостам этой проверкой не охвачены.
+
+После следующего обновления основной версии Python следует создать новое
+окружение для нового интерпретатора и переключить команды после проверки;
+перенос старого venv или библиотек между версиями Python не подходит.
