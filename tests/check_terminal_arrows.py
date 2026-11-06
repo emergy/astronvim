@@ -1,6 +1,7 @@
 import os,pty,fcntl,termios,struct,subprocess,time,select,json,tempfile
 from pathlib import Path
-base=Path(tempfile.mkdtemp(dir=Path(__file__).resolve().parents[1]/'.tmp',prefix='terminal-normal-'));sock=str(base/'nvim.sock');script=base/'setup.lua'
+scratch=Path(os.environ.get('TMPDIR',str(Path(__file__).resolve().parents[1]/'.tmp')));scratch.mkdir(parents=True,exist_ok=True)
+base=Path(tempfile.mkdtemp(dir=scratch,prefix='terminal-normal-'));sock=str(base/'nvim.sock');script=base/'setup.lua'
 worker=base/'worker.py'
 worker.write_text("import os,tty\nfrom pathlib import Path\ntty.setraw(0)\nos.write(1,b'history line\\r\\n'*80)\nwhile True:\n with (Path(__file__).parent/'input').open('ab',buffering=0) as f: f.write(os.read(0,1024))\n")
 script.write_text("""

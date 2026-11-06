@@ -1,6 +1,6 @@
 from pathlib import Path
 import os, pty, struct, fcntl, termios, subprocess, time, select, json, tempfile
-root=Path(__file__).resolve().parents[1];base=Path(tempfile.mkdtemp(prefix='scroll-focus-',dir=root/'.tmp'));sock=str(base/'nvim.sock')
+root=Path(__file__).resolve().parents[1];scratch=Path(os.environ.get('TMPDIR',str(root/'.tmp')));scratch.mkdir(parents=True,exist_ok=True);base=Path(tempfile.mkdtemp(prefix='scroll-focus-',dir=scratch));sock=str(base/'nvim.sock')
 script=base/'setup.lua'
 script.write_text('''
 vim.opt.rtp:prepend(CONFIG)

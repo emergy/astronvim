@@ -1,9 +1,10 @@
 from pathlib import Path
 import os,pty,struct,fcntl,termios,subprocess,time,select,json,tempfile
-root=Path(__file__).resolve().parents[1];base=Path(tempfile.mkdtemp(prefix='buffer-middle-',dir=root/'.tmp'));sock=str(base/'nvim.sock')
+root=Path(__file__).resolve().parents[1];scratch=Path(os.environ.get('TMPDIR',str(root/'.tmp')));scratch.mkdir(parents=True,exist_ok=True);base=Path(tempfile.mkdtemp(prefix='buffer-middle-',dir=scratch));sock=str(base/'nvim.sock')
 for name in ('alpha','bravo','charlie','delta'):(base/(name+'.txt')).write_text(name+'\n')
 script=base/'setup.lua'
 script.write_text('''
+vim.cmd.cd(BASE)
 vim.opt.mouse='a'
 vim.opt.showtabline=2
 for _,name in ipairs({'alpha','bravo','charlie','delta'}) do vim.cmd.edit(BASE..'/'..name..'.txt') end
@@ -45,6 +46,10 @@ def tabclick(name,button=1):
  click(x,1,button)
 try:
  pump(2);st=state()
+ deadline=time.monotonic()+20
+ while ('bravo.txt' not in st['rows']) and time.monotonic()<deadline:
+  pump(.2);st=state()
+ assert 'bravo.txt' in st['rows'],st
  row=st['rows']['bravo.txt'];click(**row);st=state()
  assert 'bravo.txt' not in st['bufs'] and st['current']=='alpha.txt',st
  print('PASS inactive Bufs pointed buffer close, editor retained')
