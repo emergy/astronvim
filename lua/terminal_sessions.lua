@@ -91,6 +91,7 @@ function M.select()
     format_item = M.label,
   }, function(term)
     if not term then return end
+    if slot and require("user_platform").termux then require("terminal_zoom").close(slot) end
     if term:is_open() then
       term:focus()
     elseif slot and slot:is_open() then
@@ -102,11 +103,13 @@ function M.select()
       slot.window = nil
       term.window = target_window
       vim.api.nvim_win_set_buf(target_window, term.bufnr)
+      term:__set_options()
       require("toggleterm.ui").set_winbar(term)
       if term.on_open then term:on_open() end
     else
       term:open(nil, "horizontal")
     end
+    require("terminal_zoom").open(term)
     vim.cmd.startinsert()
   end)
 end
