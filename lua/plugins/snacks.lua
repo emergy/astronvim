@@ -25,7 +25,7 @@ return {
     }
     for index = 1, 2 do
       local alias = vim.deepcopy(keys[index])
-      alias[1] = "<C-Up>"
+      alias[1] = "<C-S-Up>"
       keys[#keys + 1] = alias
     end
     return keys
