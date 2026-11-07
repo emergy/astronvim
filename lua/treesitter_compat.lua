@@ -8,6 +8,18 @@ local function single_nodes(captures)
   return nodes
 end
 
+local function legacy_query(parsed)
+  return setmetatable({
+    iter_matches = function(_, ...)
+      local iterator = parsed:iter_matches(...)
+      return function(...)
+        local pattern, captures, metadata, tree = iterator(...)
+        return pattern, captures and single_nodes(captures), metadata, tree
+      end
+    end,
+  }, { __index = parsed })
+end
+
 function M.setup()
   if M.ready or vim.fn.has "nvim-0.12" == 0 then return end
   local query = vim.treesitter.query
@@ -33,18 +45,22 @@ function M.setup()
   local queries = require "nvim-treesitter.query"
   local prepared = queries.iter_prepared_matches
   queries.iter_prepared_matches = function(parsed, ...)
-    local proxy = setmetatable({
-      iter_matches = function(_, ...)
-        local iterator = parsed:iter_matches(...)
-        return function()
-          local pattern, captures, metadata = iterator()
-          return pattern, captures and single_nodes(captures), metadata
-        end
-      end,
-    }, { __index = parsed })
-    return prepared(proxy, ...)
+    return prepared(legacy_query(parsed), ...)
   end
   M.ready = true
+end
+
+function M.setup_aerial()
+  if M.aerial_ready or vim.fn.has "nvim-0.12" == 0 then return end
+  local helpers = require "aerial.backends.treesitter.helpers"
+  local get_query = helpers.get_query
+  -- Aerial читает iter_matches напрямую, минуя nvim-treesitter.query.
+  -- Оборачиваем только его запросы; современный API Neovim не меняется.
+  helpers.get_query = function(...)
+    local parsed = get_query(...)
+    return parsed and legacy_query(parsed) or nil
+  end
+  M.aerial_ready = true
 end
 
 return M
