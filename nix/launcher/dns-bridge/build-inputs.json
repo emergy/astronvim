@@ -1,0 +1,11 @@
+{
+  "platform.zip": {
+    "sha256": "0988cacad01b38a18a47bac14a0695f246bc76c1b06c0eeb8eb0dc825ab0c8e0",
+    "sha1": "0bb560a90a7a2cbd0dd8348224d518b638fe7949"
+  },
+  "build-tools.zip": {
+    "sha256": "bd3a4966912eb8b30ed0d00b0cda6b6543b949d5ffe00bea54c04c81e1561d88",
+    "sha1": "2cfaa0bbb2336e9ec18ed3ecea84fa2e2af607bc"
+  },
+  "jdk_image": "eclipse-temurin@sha256:43338b737d0f75d6883d3c4563bc66974113ca8ac296e82f39d161fb3d398f0d"
+}

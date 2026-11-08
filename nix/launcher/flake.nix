@@ -15,6 +15,9 @@
       };
       startSshd = pkgs.writeShellScriptBin "start-sshd" (builtins.readFile ./start-sshd);
       setupStorage = pkgs.writeShellScriptBin "setup-storage" (builtins.readFile ./setup-storage.sh);
+      androidDns = pkgs.writeScriptBin "android-dns" (
+        "#!${pkgs.python3}/bin/python3\n" + builtins.readFile ./dns-bridge/android_dns.py
+      );
       invi = pkgs.buildGoModule {
         pname = "invi";
         version = "git-12ac4ed";
@@ -63,7 +66,7 @@
             vscode-langservers-extracted helm-ls marksman stylua shfmt
             tmux bubblewrap
             kubectl kubernetes-helm k9s argocd rclone vifm mc gh terraform-ls shellcheck
-            codex invi startSshd setupStorage
+            codex invi startSshd setupStorage androidDns
             termuxAm termuxTools.open termuxTools.open_url termuxTools.xdg_open
             termuxTools.reload_settings termuxTools.setup_storage
             termuxTools.wake_lock termuxTools.wake_unlock
