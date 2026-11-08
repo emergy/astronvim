@@ -64,3 +64,9 @@ else
 fi
 unset __workstation_profile __workstation_command
 . "$HOME/.config/workstation/ssh-agent.sh"
+
+# Обновление DNS при запуске оболочки и вручную; фонового процесса нет.
+dns-sync() {
+  android-dns --output "$HOME/.local/state/android-dns/resolv.conf"
+}
+if command -v android-dns >/dev/null 2>&1; then dns-sync; fi

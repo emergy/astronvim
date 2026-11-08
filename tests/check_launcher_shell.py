@@ -28,6 +28,8 @@ mock = work / "bin"
 mock.mkdir()
 (mock / "rclone").write_text('#!/usr/bin/env bash\nprintf "%s\\n" "$@" > "$TEST_WORK/rclone-args"\ncat > "$TEST_WORK/archive"\n')
 (mock / "rclone").chmod(0o700)
+(mock / "android-dns").write_text('#!/usr/bin/env bash\n[[ $1 == --output ]] || exit 1\nmkdir -p "${2%/*}"\nprintf "nameserver 192.0.2.53\\n" > "$2"\n')
+(mock / "android-dns").chmod(0o700)
 env = {**os.environ, "HOME": str(home), "TMPDIR": str(work), "TEST_WORK": str(work),
        "PATH": f"{mock}:{profile}/bin:" + os.environ["PATH"]}
 for name in ("SSH_AUTH_SOCK", "SSH_AGENT_PID", "KUBECONFIG", "BASH_ENV"):
@@ -38,6 +40,9 @@ script = r'''
 [[ $(alias vim) == "alias vim='nvim'" ]] || exit 12
 [[ $KUBECONFIG == "$HOME/.kube/a.config:$HOME/.kube/b space.config" ]] || exit 13
 [[ $KUBE_EDITOR == nvim ]] || exit 14
+declare -F dns-sync >/dev/null || exit 27
+grep -qx "nameserver 192.0.2.53" "$HOME/.local/state/android-dns/resolv.conf" || exit 28
+dns-sync || exit 29
 for command in kubectl k helm argocd codex; do complete -p "$command" >/dev/null || exit 15; done
 ssh-add -l >/dev/null || exit 16
 socket=$SSH_AUTH_SOCK

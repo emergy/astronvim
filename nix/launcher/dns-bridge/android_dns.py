@@ -97,46 +97,26 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--json", action="store_true", help="показать сведения Android, ничего не менять")
     parser.add_argument("--output", type=Path, help="генерируемый файл; без этого параметра выводится предпросмотр")
-    parser.add_argument("--watch", action="store_true", help="обновлять файл периодически, пока работает команда")
-    parser.add_argument("--interval", type=float, default=30, help="интервал --watch в секундах, минимум 5")
     args = parser.parse_args()
     if args.json and args.output:
         parser.error("--json несовместим с --output")
-    if args.watch and (not args.output or args.json):
-        parser.error("--watch требует --output и несовместим с --json")
-    if args.interval < 5:
-        parser.error("--interval должен быть не меньше 5 секунд")
-    last_warning = None
-    while True:
-        try:
-            snapshot = query()
-            if args.json:
-                print(json.dumps(snapshot, ensure_ascii=False, indent=2))
-                return 0
-            text, warning = render(snapshot)
-            if args.output:
-                write_config(args.output, text)
-            else:
-                print(text, end="")
-            if warning != last_warning and warning:
-                print(warning, file=sys.stderr)
-            last_warning = warning
-            status = 1 if warning else 0
-        except (OSError, ValueError, subprocess.SubprocessError) as error:
-            warning = str(error)
-            if warning != last_warning:
-                print(warning, file=sys.stderr)
-            last_warning = warning
-            if args.watch:
-                try:
-                    write_config(args.output, BLOCKED)
-                except (OSError, ValueError) as write_error:
-                    print("Не удалось записать файл DNS: " + str(write_error), file=sys.stderr)
-                    return 1
-            status = 1
-        if not args.watch:
-            return status
-        time.sleep(args.interval)
+    try:
+        snapshot = query()
+        if args.json:
+            print(json.dumps(snapshot, ensure_ascii=False, indent=2))
+            return 0
+        text, warning = render(snapshot)
+        if args.output:
+            write_config(args.output, text)
+        else:
+            print(text, end="")
+        if warning:
+            print(warning, file=sys.stderr)
+        return 1 if warning else 0
+    except (OSError, ValueError, subprocess.SubprocessError) as error:
+        print(str(error), file=sys.stderr)
+        return 1
+
 
 
 if __name__ == "__main__":

@@ -87,6 +87,12 @@ class AndroidDnsChecks(unittest.TestCase):
                 dns.write_config(alias, "bad")
             self.assertEqual(target.read_text(), "nameserver 10.0.0.54\n")
 
+    def test_watch_mode_is_not_available(self):
+        with patch.object(dns.sys, "argv", ["android-dns", "--watch"]), patch.object(dns.sys, "stderr"):
+            with self.assertRaises(SystemExit) as result:
+                dns.main()
+            self.assertEqual(result.exception.code, 2)
+
     def test_query_uses_explicit_component_without_shell(self):
         with patch.object(dns.subprocess, "run") as run:
             run.return_value.stdout = response(snapshot())
