@@ -14,6 +14,7 @@
         termux-am = termuxAm;
       };
       startSshd = pkgs.writeShellScriptBin "start-sshd" (builtins.readFile ./start-sshd);
+      setupStorage = pkgs.writeShellScriptBin "setup-storage" (builtins.readFile ./setup-storage.sh);
       invi = pkgs.buildGoModule {
         pname = "invi";
         version = "git-12ac4ed";
@@ -55,14 +56,14 @@
             git openssh curl wget coreutils findutils gnugrep gnused gawk
             gnutar gzip bzip2 xz unzip zip file procps util-linux which
             gcc gnumake pkg-config tree-sitter
-            ripgrep fd fzf jq yq-go less bat tree lazygit
+            ripgrep fd fzf jq yq-go less bat tree lazygit bash-completion
             python3 ansible ansible-lint nodejs
             lua-language-server yaml-language-server ansible-language-server
             basedpyright bash-language-server dockerfile-language-server
             vscode-langservers-extracted helm-ls marksman stylua shfmt
             tmux bubblewrap
             kubectl kubernetes-helm k9s argocd rclone vifm mc gh terraform-ls shellcheck
-            codex invi startSshd
+            codex invi startSshd setupStorage
             termuxAm termuxTools.open termuxTools.open_url termuxTools.xdg_open
             termuxTools.reload_settings termuxTools.setup_storage
             termuxTools.wake_lock termuxTools.wake_unlock

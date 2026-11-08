@@ -9,3 +9,5 @@ if [ -r "$HOME/.termux/shell-integration/termux-launcher.bash" ]; then
   . "$HOME/.termux/shell-integration/termux-launcher.bash"
 fi
 start-sshd
+
+. "$HOME/.config/workstation/interactive-shell.sh"
