@@ -33,10 +33,10 @@
     <key c="с" ne="^c:ctrl,c" />
     <key c="м" />
     <key c="и" ne="\?" sw="/" split_before="true" />
-    <key c="т" ne=":" sw=";" />
-    <key c="ь" nw="'" ne="&quot;" sw="," se="." />
-    <key c="б" ne=":" sw=";" />
-    <key c="ю" ne="&quot;" sw="'" />
+    <key c="т" ne=";" />
+    <key c="ь" ne=":" />
+    <key c="б" ne="'" se="," />
+    <key c="ю" ne="&quot;" se="." />
     <key width="1.22" role="action" c="backspace" ne="delete" />
   </row>
   <row height="0.95">
@@ -71,7 +71,5 @@
     <fn a="с" b="insert" />
     <fn a="м" b="delete" />
     <fn a="и" b="page_down" />
-    <fn a="т" b="^c:ctrl,c" />
-    <fn a="ь" b="^d:ctrl,d" />
   </modmap>
 </keyboard>

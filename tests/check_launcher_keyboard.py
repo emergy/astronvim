@@ -10,6 +10,8 @@ en, ru = keys(latin), keys(russian)
 pairs = dict(zip("qwertyuiopasdfghjklzxcvbnm", "йцукенгшщзфывапролдячсмить"))
 slots = ("nw", "ne", "sw", "se", "n", "s", "w", "e")
 for source, target in pairs.items():
+    if target in ("т", "ь"):
+        continue
     for slot in slots:
         if (source, slot) == ("t", "nw"):
             assert ru[target].get(slot) == "ё"
@@ -31,11 +33,15 @@ for name in ("shift", "ctrl", "space", "loc alt", "loc compose", "enter", "backs
         assert en[name].get(slot) == ru[name].get(slot), (name, slot)
 en_fn = {key.get("a"): key.get("b") for key in latin.find("modmap")}
 ru_fn = {key.get("a"): key.get("b") for key in russian.find("modmap")}
-assert {pairs[key]: action for key, action in en_fn.items()} == ru_fn
+assert {pairs[key]: action for key, action in en_fn.items() if pairs[key] not in ("т", "ь", "б", "ю")} == ru_fn
+for char, gestures in {"т": {"ne": ";"}, "ь": {"ne": ":"},
+                       "б": {"ne": "'", "se": ","}, "ю": {"ne": chr(34), "se": "."}}.items():
+    assert ru[char].attrib == {"c": char, **gestures}, char
+    assert char not in ru_fn
 for key, slot, action in (("c", "ne", "^c:ctrl,c"), ("d", "ne", "^d:ctrl,d"),
                           ("e", "se", "^e:ctrl,e"), ("o", "nw", "^o:ctrl,o"),
                           ("z", "ne", "⌥z:alt,z")):
     assert en[key].get(slot) == action
 assert en["p"].get("sw") == ":keyevent flags='small' symbol='F7':137"
 assert en["p"].get("se") == ":keyevent flags='small' symbol='F8':138"
-print("PASS: both layouts, all shared gestures/Fn actions, four-way sliders, Russian letters and ё")
+print("PASS: both layouts, shared gestures/Fn actions, simplified Russian punctuation, four-way sliders and ё")
