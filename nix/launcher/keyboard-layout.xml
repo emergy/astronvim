@@ -27,11 +27,11 @@
     <key width="1.5" c="shift" ne="loc capslock" />
     <key c="z" n="Zoom:alt,z" />
     <key c="x" ne="loc †" />
-    <key c="c" sw="." n="^C:ctrl,c" />
+    <key c="c" n="^C:ctrl,c" />
     <key c="v" sw="," />
     <key c="b" split_before="true" ne="\?" sw="/" />
     <key c="n" ne=":" sw=";" />
-    <key c="m" ne="&quot;" sw="'" />
+    <key c="m" ne="&quot;" sw="'" se="." />
     <key width="1.5" c="backspace" ne="delete" />
   </row>
   <row height="0.95">
