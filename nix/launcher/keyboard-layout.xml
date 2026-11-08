@@ -28,10 +28,10 @@
     <key c="z" n="Zoom:alt,z" />
     <key c="x" ne="loc †" />
     <key c="c" n="^C:ctrl,c" />
-    <key c="v" sw="," />
+    <key c="v" />
     <key c="b" split_before="true" ne="\?" sw="/" />
     <key c="n" ne=":" sw=";" />
-    <key c="m" ne="&quot;" sw="'" se="." />
+    <key c="m" ne="&quot;" nw="'" sw="," se="." />
     <key width="1.5" c="backspace" ne="delete" />
   </row>
   <row height="0.95">
