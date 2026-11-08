@@ -62,7 +62,7 @@ def closed():
 
 try:
     pump(1.5)
-    termux = lua('require("user_platform").termux') == 'true'
+    termux = lua('require("user_platform").mobile') == 'true'
     assert lua('vim.fn.maparg("<Space>t","n",false,true).nowait') == '1'
     assert lua('vim.fn.maparg("<Space>Tf","n") ~= ""') == 'true'
     key(b' t'); opened(termux)
@@ -88,7 +88,7 @@ try:
     key(b'\x1b[18~'); value=opened(termux)
     assert value['count']==2 and value['open']==1, value
     print('PASS F8 switches/reselects with zoom and without extra splits or sessions')
-    print('PASS profile:', 'Termux auto-zoom' if termux else 'Linux split unchanged')
+    print('PASS profile:', 'mobile auto-zoom' if termux else 'Linux split unchanged')
 finally:
     try: lua('vim.schedule(function() vim.cmd("qa!") end)')
     except Exception: pass

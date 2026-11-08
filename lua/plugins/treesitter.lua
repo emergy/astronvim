@@ -10,7 +10,12 @@ return {
   end,
   config = function(plugin, opts)
     require("treesitter_compat").setup()
-    if require("user_platform").termux then require("treesitter_termux").setup() end
+    local platform = require "user_platform"
+    if platform.termux then
+      require("treesitter_termux").setup()
+    elseif platform.nix_on_droid then
+      require("treesitter_build").setup()
+    end
     require "astronvim.plugins.configs.nvim-treesitter"(plugin, opts)
   end,
   opts = function(_, opts)

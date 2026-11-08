@@ -83,11 +83,11 @@ vim.defer_fn(function()
     local config = require "which-key.config"
     assert(not config.filter { lhs = "[и", desc = "duplicate" }, "Cyrillic mapping hidden")
     assert(config.filter { lhs = "[b", desc = "Previous buffer" }, "English mapping retained")
-    if platform.termux then
+    if platform.system_tools then
       local plugins = require("lazy.core.config").plugins
-      assert(not plugins["mason.nvim"], "Mason disabled in Termux")
+      assert(not plugins["mason.nvim"], "Mason disabled for system-managed tools")
       local blink = require("lazy.core.plugin").values(plugins["blink.cmp"], "opts", false)
-      assert(blink.fuzzy.implementation == "lua", "Termux uses Lua fuzzy matching")
+      assert(blink.fuzzy.implementation == "lua", "Mobile profiles use Lua fuzzy matching")
       assert(require("blink.cmp.fuzzy").implementation_type == "lua", "Lua fuzzy backend actually initialized")
     end
     print "PASS: full configuration, keymaps, Markdown, Codex panel, terminals, Ansible snippets/indent, Which-key, platform policy"

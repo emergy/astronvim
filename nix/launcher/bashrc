@@ -1,0 +1,11 @@
+. "$HOME/.config/workstation/shell-env.sh"
+case $- in
+  *i*) ;;
+  *) return ;;
+esac
+export HISTSIZE=100000 HISTFILESIZE=100000
+shopt -s histappend
+if [ -r "$HOME/.termux/shell-integration/termux-launcher.bash" ]; then
+  . "$HOME/.termux/shell-integration/termux-launcher.bash"
+fi
+start-sshd

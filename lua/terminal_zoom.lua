@@ -7,7 +7,7 @@ function M.close(term)
 end
 
 function M.open(term)
-  if not require("user_platform").termux or term.hidden or not term.window then return end
+  if not require("user_platform").mobile or term.hidden or not term.window then return end
   if not vim.api.nvim_win_is_valid(term.window) or not term:is_split() then return end
   vim.schedule(function()
     if not term:is_open() or vim.api.nvim_get_current_buf() ~= term.bufnr then return end

@@ -26,7 +26,7 @@ return {
     width = 0.33, -- Доля общей ширины Neovim для панели Codex
     height = 0.8, -- Height of the floating window (0.0 to 1.0)
     model = nil, -- Optional: pass a string to use a specific model (e.g., 'o3-mini')
-    autoinstall = not (require("user_platform").termux or require("user_platform").testing), -- В Termux нужен нативный CLI.
+    autoinstall = not (require("user_platform").system_tools or require("user_platform").testing), -- На мобильных профилях CLI ставится средствами окружения.
     panel = true, -- Открывать Codex вертикальной панелью справа
     use_buffer = false, -- Capture Codex stdout into a normal buffer instead of a terminal buffer
   },

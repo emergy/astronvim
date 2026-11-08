@@ -91,7 +91,7 @@ function M.select()
     format_item = M.label,
   }, function(term)
     if not term then return end
-    if slot and require("user_platform").termux then require("terminal_zoom").close(slot) end
+    if slot and require("user_platform").mobile then require("terminal_zoom").close(slot) end
     if term:is_open() then
       term:focus()
     elseif slot and slot:is_open() then

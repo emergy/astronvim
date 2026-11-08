@@ -309,3 +309,10 @@ Linux/WSL сохраняет обычное открытие терминала 
 
 Настройка: `lua/plugins/toggleterm.lua`, `lua/terminal_zoom.lua`.
 Проверка: `python3 tests/check_terminal_toggle_zoom.py`.
+
+## Nix-on-Droid / Termux Launcher Nix
+
+Это отдельный Linux ARM64 профиль, совместимый с прежним Termux.
+Пакеты описаны декларативно в `nix/launcher/flake.nix`; Android-пакеты
+и каталоги tools старого Termux в нём не используются.
+Инструкции, SSH, клавиатура и проверки: [Nix Launcher](nix-launcher.md).

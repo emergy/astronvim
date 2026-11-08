@@ -4,14 +4,14 @@ local platform = require "user_platform"
 local plugins = {
   {
     "zbirenbaum/copilot.lua",
-    -- Закреплённый сервер содержит нативный policy-watcher без Android-бинарника.
-    enabled = not platform.termux,
+    -- На мобильных профилях сохраняем отдельный Codex без фонового Copilot.
+    enabled = not platform.mobile,
   },
   {
     "Saghen/blink.cmp",
     opts = function(_, opts)
-      if platform.termux then
-        -- Lua работает без загрузки glibc-библиотеки и без установки Rust.
+      if platform.mobile then
+        -- Lua не требует загрузки внешних нативных библиотек или установки Rust.
         opts.fuzzy = vim.tbl_deep_extend("force", opts.fuzzy or {}, { implementation = "lua" })
       end
     end,
@@ -60,7 +60,7 @@ if platform.system_tools then
   }
 end
 
-if platform.testing and not platform.termux then
+if platform.testing and not platform.system_tools then
   for _, plugin in ipairs {
     "williamboman/mason-lspconfig.nvim",
     "jay-babu/mason-null-ls.nvim",

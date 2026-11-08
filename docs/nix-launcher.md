@@ -1,0 +1,120 @@
+# Nix Launcher: рабочее окружение телефона
+
+Конфигурация поддерживает три независимых профиля. Удаление Termux или перенос
+его бинарников в Nix не требуется.
+
+| Профиль | Пакеты и LSP | Компилятор парсеров | Терминал |
+|---|---|---|---|
+| WSL / обычный Linux | прежний Mason | прежняя настройка | сплит |
+| Termux | Android-пакеты и прежний `nvim/tools` | нативный clang | автоматический Zoom |
+| Nix-on-Droid / Nix Launcher | Linux ARM64 из Nix | нативный cc из Nix | автоматический Zoom |
+
+Nix определяется по каталогу приложения или `NVIM_PROFILE=nix-on-droid`.
+Он не подставляет пути инструментов Termux. На обоих мобильных профилях
+Mason отключён, blink.cmp использует Lua, а отдельный Codex заменяет фоновый Copilot.
+
+## Декларация пакетов
+
+Источник в этом репозитории — `nix/launcher/flake.nix` и `flake.lock`.
+Рабочая копия на телефоне — `~/.config/workstation/`.
+Профиль — `~/.local/share/workstation/current`.
+
+В декларацию входят Neovim с алиасами vim/vi, Git/OpenSSH, Ansible и ansible-lint,
+Python/Node.js, LSP, компилятор и средства сборки, Tree-sitter, lazygit, tmux,
+поиск и архиваторы, kubectl/Helm/k9s/Argo CD, rclone/vifm/mc/gh, Android-мост am/xdg-open/reload-settings, start-sshd, Codex и Invi.
+Пакеты не ставились через `nix-env -i`. Исходная системная конфигурация
+`~/.config/nix-on-droid/` сохранена: дополнительный профиль независим от неё.
+
+Применение после изменения списка пакетов:
+
+```bash
+nix build "path:$HOME/.config/workstation#default" \
+  --out-link "$HOME/.local/share/workstation/current" --cores 2 --max-jobs 1
+exec bash -l
+```
+
+Версии nixpkgs и Nix-on-Droid зафиксированы в lock-файле. Codex 0.167.0
+устанавливается из официального Linux ARM64 musl-архива с проверкой хеша.
+Invi собирается через buildGoModule из снимка коммита `12ac4ed`,
+с фиксированными хешами исходников и Go-зависимостей. Встроенные Go-тесты при
+пакетной сборке отключены; на телефоне отдельно проверены запуск и загрузка
+перенесённой пользовательской конфигурации. Внешние действия над инфраструктурой
+не выполнялись; `invi inv` оставлен без настройки по просьбе пользователя.
+
+Снимок `~/.config/workstation/invi-src/` содержит исходники приложения,
+не пользовательские настройки и секреты. Он нужен для воспроизведения сборки.
+В репозиторий Neovim этот отдельный исходный проект не добавляется.
+Его можно восстановить из исходного репозитория Invi:
+
+```bash
+mkdir -p ~/.config/workstation/invi-src
+git -C /путь/к/репозиторию/invi archive 12ac4ed \
+  | tar -xf - -C ~/.config/workstation/invi-src
+```
+
+## SSH и оболочка
+
+Доступ: `ssh nix-on-droid@s24 -p 8023`.
+Исходный sshd_config проверен: вход по ключам, пароль и PAM выключены.
+Проблема была в PATH неинтерактивных SSH-команд. Новые `.bashrc` и
+`.bash_profile` подключают `~/.config/workstation/shell-env.sh`;
+обычный SSH теперь находит nix, nvim, ansible и codex.
+Интерактивный Bash вызывает идемпотентный `start-sshd`.
+SSH не настраивался на автоматический запуск после перезагрузки Android:
+сервер поднимается при запуске оболочки Launcher.
+
+## Клавиатура Launcher
+
+Это встроенная клавиатура приложения на основе Unexpected Keyboard.
+Файлы: `~/.termux/keyboard/layout.xml` и
+`~/.termux/termux-launcher-bindings.conf`.
+
+| Клавиша / свайп | Действие |
+|---|---|
+| a вниз | Tab |
+| f ↗ / ↙ | минус / подчёркивание, перенесены с g |
+| g ↗ / ↙ | равно / плюс, перенесены с h |
+| h ↙ / ↘ | угловые скобки, перенесены с c/v |
+| c вверх | Ctrl+C |
+| d вверх | Ctrl+D |
+| p ↙ / ↘ | Ctrl+Grave / Ctrl+Shift+Grave → F7/F8 |
+| Enter вниз | Ctrl+Enter → LF для новой строки в Codex |
+| z вверх | Alt+Z, зум Neovim |
+| s ↖ / ↗ | предыдущая / следующая сессия Launcher |
+
+Для Grave используется настоящий Android KeyEvent с модификаторами;
+передача обычного символа с Ctrl превратила бы обе комбинации в NUL.
+Переназначение F7/F8 выполняет Launcher до передачи клавиш Neovim.
+Ctrl+C/D, обычные буквы, Fn-слой и остальные свайпы сохранены.
+Применение: `termux-reload-settings`; XML также перечитывается при показе клавиатуры.
+[Документация формата](https://picklehik3.github.io/termux-launcher-site/docs/#wiki/keyboard-layout).
+
+## Codex и приватные настройки
+
+Авторизация и конфиг Codex, конфигурация Invi, SSH-клиента, kubectl/k9s,
+Argo CD, rclone, vifm, mc и lazygit передавались напрямую
+между окружениями телефона. Ключи и auth.json имеют права 0600 и не входят в Nix
+store или этот репозиторий. Бинарники Termux, node_modules, Mason и скомпилированные
+библиотеки между окружениями не копировались. Общий `~/.codex/AGENTS.md`
+перенесён с компьютера с проверкой контрольной суммы.
+
+Внутренний Linux sandbox Codex здесь недоступен: Android закрывает нужные
+участки /proc, а fallback Landlock также не проходит проверку. Отключать его
+без согласия пользователя нельзя. Codex 0.167.0 удалил `untrusted` и поддерживает
+только `on-request` и `never`. По явному согласованию пользователя в Nix включены
+`sandbox_mode = "danger-full-access"` и `approval_policy = "on-request"`.
+В этом режиме модель сама решает, когда запросить подтверждение; ограничения
+записи средствами Linux не действуют. Конфиг обычного Termux этим не менялся.
+Проверены загрузка настроек, авторизация и запуск TUI без отправки запроса модели.
+[Официальное описание ограничений](https://learn.chatgpt.com/docs/agent-approvals-security).
+
+## Проверка
+
+Проверены полный запуск AstroNvim, YAML/Jinja, Markdown, нативные парсеры,
+переходы по функциям, подключение lua_ls/yamlls/ansiblels/basedpyright,
+реальные клавиши переключения режимов, F7/F8/Space t, Zoom и сохранение процессов.
+Ansible выполнил localhost-playbook из ping/command/assert; Vault прошёл
+шифрование, расшифровку и редактирование через Neovim с проверкой ошибок сохранения.
+Проверки общей сборки также выполнены на исходном Termux и в WSL.
+Физические свайпы на экране задаются проверенным XML; проверка жеста пальцем
+остаётся пользовательской проверкой интерфейса.

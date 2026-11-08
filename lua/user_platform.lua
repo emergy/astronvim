@@ -1,9 +1,14 @@
 local M = {}
 
 local prefix = vim.env.PREFIX or ""
-M.termux = prefix:find("/com.termux/", 1, true) ~= nil or vim.env.TERMUX_VERSION ~= nil
+local home = vim.env.HOME or ""
+M.nix_on_droid = vim.env.NVIM_PROFILE == "nix-on-droid"
+  or home:find("/com.termux.launcher.nix/", 1, true) ~= nil
+  or home:find("/com.termux.nix/", 1, true) ~= nil
+M.termux = not M.nix_on_droid and (prefix:find("/com.termux/", 1, true) ~= nil or vim.env.TERMUX_VERSION ~= nil)
+M.mobile = M.termux or M.nix_on_droid
 M.testing = vim.env.NVIM_UNIVERSAL_TEST == "1"
-M.system_tools = M.termux
+M.system_tools = M.mobile
 
 function M.setup_path()
   if not M.termux then return end

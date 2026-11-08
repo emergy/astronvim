@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -eu
+. "$HOME/.config/workstation/shell-env.sh"
+config="$HOME/.config/sshd/sshd_config"
+pidfile="$HOME/.config/sshd/sshd.pid"
+if [ -r "$pidfile" ]; then
+  read -r pid < "$pidfile"
+  case "$pid" in
+    ''|*[!0-9]*) ;;
+    *) if kill -0 "$pid" 2>/dev/null; then exit 0; fi ;;
+  esac
+fi
+sshd_bin=$(command -v sshd)
+"$sshd_bin" -t -f "$config"
+exec "$sshd_bin" -f "$config" -E "$TMPDIR/launcher-sshd.log"

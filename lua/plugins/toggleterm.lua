@@ -38,7 +38,7 @@ return {
   opts = function(_, opts)
     opts.size = 20
     opts.auto_scroll = false
-    if require("user_platform").termux then require("terminal_zoom").setup(opts) end
+    if require("user_platform").mobile then require("terminal_zoom").setup(opts) end
     require("terminal_sessions").setup()
     opts.winbar = {
       enabled = true,
