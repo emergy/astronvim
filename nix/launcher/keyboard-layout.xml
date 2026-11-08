@@ -9,7 +9,7 @@
     <key c="y" split_before="true" ne="6" sw="^" />
     <key c="u" ne="7" sw="&amp;" />
     <key c="i" ne="8" sw="*" />
-    <key c="o" ne="9" sw="(" se="^O:ctrl,o" n=")" />
+    <key c="o" ne="9" sw="(" se=")" nw="^O:ctrl,o" />
     <key c="p" ne="0" sw=":keyevent flags='small' symbol='F7':137" se=":keyevent flags='small' symbol='F8':138" />
   </row>
   <row>
