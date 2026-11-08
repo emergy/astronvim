@@ -1,0 +1,77 @@
+<?xml version='1.0' encoding='utf-8'?>
+<keyboard name="ЙЦУКЕН — рабочая раскладка" script="cyrillic" bottom_row="false">
+  <row>
+    <key c="й" ne="1" se="loc esc" />
+    <key c="ц" nw="~" ne="2" sw="\@" />
+    <key c="у" nw="!" ne="3" sw="\#" se="^e:ctrl,e" n="loc €" />
+    <key c="к" ne="4" sw="$" />
+    <key c="е" ne="5" sw="%" nw="ё" />
+    <key c="н" ne="6" sw="^" split_before="true" />
+    <key c="г" ne="7" sw="&amp;" />
+    <key c="ш" ne="8" sw="*" />
+    <key c="щ" nw="^o:ctrl,o" ne="9" sw="(" se=")" />
+    <key c="з" ne="0" sw=":keyevent flags='small' symbol='F7':137" se=":keyevent flags='small' symbol='F8':138" />
+    <key c="х" sw="[" se="]" />
+  </row>
+  <row>
+    <key c="ф" ne="`" s="tab" />
+    <key c="ы" nw="tool:session.previous:‹" ne="tool:session.next:›" sw="loc ß" />
+    <key c="в" ne="^d:ctrl,d" />
+    <key c="а" ne="-" sw="_" />
+    <key c="п" ne="=" sw="+" />
+    <key c="р" sw="&lt;" se="&gt;" split_before="true" />
+    <key c="о" sw="{" se="}" />
+    <key c="л" sw="[" se="]" />
+    <key c="д" ne="|" sw="\\" />
+    <key c="ж" ne="=" sw="+" />
+    <key c="э" ne="|" sw="\\" />
+  </row>
+  <row scale="11">
+    <key width="1.22" role="action" c="shift" ne="loc capslock" sw="switch_backward" />
+    <key c="я" ne="⌥z:alt,z" />
+    <key c="ч" ne="loc †" />
+    <key c="с" ne="^c:ctrl,c" />
+    <key c="м" />
+    <key c="и" ne="\?" sw="/" split_before="true" />
+    <key c="т" ne=":" sw=";" />
+    <key c="ь" nw="'" ne="&quot;" sw="," se="." />
+    <key c="б" ne=":" sw=";" />
+    <key c="ю" ne="&quot;" sw="'" />
+    <key width="1.22" role="action" c="backspace" ne="delete" />
+  </row>
+  <row height="0.95">
+    <key width="1.7" c="ctrl" ne="tool:app.command_palette:󱎱" sw="loc switch_clipboard" se="switch_numeric" n="loc meta" />
+    <key width="1.3" c="loc alt" nw="fn" ne="loc change_method" se="config" />
+    <key width="4.0" c="space" split_at="2.5" w="cursor_left" e="cursor_right" s="cursor_down" n="cursor_up" nw="tool:window.previous:󰜳" ne="tool:window.next:󰜶" sw="tool:session.previous:󰜹" se="tool:session.next:󰜰" />
+    <key width="1.3" c="loc compose" nw="home" ne="page_up" sw="page_down" se="end" w="left" e="right" n="up" s="down" />
+    <key width="1.7" c="enter" n="voice_typing" s="^↵:ctrl,enter" />
+  </row>
+  <modmap>
+    <fn a="й" b="f1" />
+    <fn a="ц" b="f2" />
+    <fn a="у" b="f3" />
+    <fn a="к" b="f4" />
+    <fn a="е" b="f5" />
+    <fn a="н" b="f6" />
+    <fn a="г" b="f7" />
+    <fn a="ш" b="f8" />
+    <fn a="щ" b="f9" />
+    <fn a="з" b="f10" />
+    <fn a="ф" b="esc" />
+    <fn a="ы" b="tab" />
+    <fn a="в" b="home" />
+    <fn a="а" b="up" />
+    <fn a="п" b="end" />
+    <fn a="р" b="page_up" />
+    <fn a="о" b="left" />
+    <fn a="л" b="down" />
+    <fn a="д" b="right" />
+    <fn a="я" b="f11" />
+    <fn a="ч" b="f12" />
+    <fn a="с" b="insert" />
+    <fn a="м" b="delete" />
+    <fn a="и" b="page_down" />
+    <fn a="т" b="^c:ctrl,c" />
+    <fn a="ь" b="^d:ctrl,d" />
+  </modmap>
+</keyboard>
