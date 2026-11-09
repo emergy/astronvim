@@ -42,9 +42,9 @@
   <row height="0.95">
     <key width="1.7" c="ctrl" ne="tool:app.command_palette:󱎱" sw="loc switch_clipboard" se="switch_numeric" n="loc meta" />
     <key width="1.3" c="loc alt" nw="fn" ne="loc change_method" se="config" />
-    <key width="4.0" c="space" split_at="2.5" w="cursor_left" e="cursor_right" s="cursor_down" n="cursor_up" nw="tool:window.previous:󰜳" ne="tool:window.next:󰜶" sw="tool:session.previous:󰜹" se="tool:session.next:󰜰" />
+    <key width="5.5" c="space" split_at="2.5" w="cursor_left" e="cursor_right" s="cursor_down" n="cursor_up" nw="tool:window.previous:󰜳" ne="tool:window.next:󰜶" sw="tool:session.previous:󰜹" se="tool:session.next:󰜰" />
     <key width="1.3" c="loc compose" nw="home" ne="page_up" sw="page_down" se="end" w="left" e="right" n="up" s="down" />
-    <key width="1.7" c="enter" n="voice_typing" s="^↵:ctrl,enter" />
+    <key width="1.2" c="enter" n="voice_typing" s="^↵:ctrl,enter" />
   </row>
   <modmap>
     <fn a="й" b="f1" />

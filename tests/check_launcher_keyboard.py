@@ -56,4 +56,23 @@ assert ru["э"].get("ne") == "|" and ru["э"].get("sw") == "\\\\"
 assert ru["п"].get("ne") == "=" and ru["п"].get("sw") == "+"
 assert en["p"].get("sw") == ":keyevent flags='small' symbol='F7':137"
 assert en["p"].get("se") == ":keyevent flags='small' symbol='F8':138"
+# Геометрия как в KeyboardData.Row: scale нормирует ширины всех клавиш ряда.
+def geometry(row):
+    total = sum(float(key.get("width", "1")) + float(key.get("shift", "0")) for key in row)
+    factor = float(row.get("scale", total)) / total
+    left, result = 0.0, {}
+    for key in row:
+        left += float(key.get("shift", "0")) * factor
+        right = left + float(key.get("width", "1")) * factor
+        result[key.get("c")] = (left, right)
+        left = right
+    return left, result
+
+letter_width, letters = geometry(russian.findall("row")[2])
+bottom_width, bottom = geometry(russian.findall("row")[3])
+assert abs(bottom_width - letter_width) < 0.001, "Russian bottom row must fill the keyboard"
+assert abs(bottom["enter"][0] - letters["backspace"][0]) < 0.03, "Enter must align below Backspace"
+assert bottom["enter"][0] >= letters["ю"][1] - 0.03, "Enter must not sit below the period key"
+assert abs(bottom["enter"][1] - letter_width) < 0.001
+assert float(ru["space"].get("width")) > float(en["space"].get("width"))
 print("PASS: both layouts, shared gestures/Fn actions, simplified Russian punctuation, four-way sliders and ё")
