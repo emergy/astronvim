@@ -148,14 +148,14 @@ try:
     after_clear=wait_for(lambda s: s.get('active')==2 and s['mode']=='t' and s['lines']<100 and s['scrollback']==100000,
                          'Ctrl-k clears history and restores the limit')
     assert after_clear['job']==before_clear['job'] and after_clear['window']==before_clear['window'], 'clearing must preserve process and focus'
-    send(b'\x08\n\x0c')  # Ctrl-h/j/l, including the Ctrl+Enter newline
+    send(b'\x08\n\x0c\x1bt')  # Ctrl-h/j/l and Alt+t must reach the terminal
     end=time.monotonic()+5
     received=artifacts/'terminal-input.bin'
     while time.monotonic()<end:
         drain()
-        if received.exists() and received.read_bytes()==b'\x08\n\x0c':
+        if received.exists() and received.read_bytes()==b'\x08\n\x0c\x1bt':
             break
-    assert received.exists() and received.read_bytes()==b'\x08\n\x0c', 'original control keys must reach the terminal'
+    assert received.exists() and received.read_bytes()==b'\x08\n\x0c\x1bt', 'control keys and Alt-t must reach the terminal'
     send(b'\x1b[107;6u')  # Ctrl-Shift-k
     wait_for(lambda s: s['file'].endswith('file-1.txt') and s['mode']=='n', 'Ctrl-Shift-k returns to editor')
     send(b'\x1b[1;3B')  # Alt-Down from editor
@@ -173,12 +173,12 @@ try:
     assert key_file.exists(), 'Neo-tree Hop labels appear'
     send(key_file.read_text().strip().encode())
     wait_for(lambda s: s['file'].endswith('file-2.txt') and s['trees']==0, 'Space bb opens file and hides tree')
-    send(b'\x1bt')  # Alt+t: new session, existing terminal panel is reused
+    send(b' tn')  # Space tn: new session, existing terminal panel is reused
     wait_for(lambda s: s.get('active')==3 and s['count']==3 and s['windows']==2 and s['mode']=='t',
-             'Alt-t creates a new session in the existing panel')
-    send(b'\x1bz\x1bt')
+             'Space tn creates a new session in the existing panel')
+    send(b'\x1bz\x1b[1;6D tn')
     wait_for(lambda s: s.get('active')==4 and s['count']==4 and s['windows']==2 and s['zoom'] and s['mode']=='t',
-             'Alt-t creates a new session while preserving zoom')
+             'Space tn creates a new session while preserving zoom')
     hint_time = key_file.stat().st_mtime_ns
     send(b'\x1b[1;6D bb')  # Terminal Normal mode, then the existing buffer menu
     end=time.monotonic()+8
@@ -193,7 +193,7 @@ try:
     while process.poll() is None and time.monotonic()<end:
         drain()
     assert process.poll()==0, 'clean Neovim exit'
-    print('PASS: Neo-tree :edit; F7/F8 including zoom switches; Alt-t new sessions including zoom; '
+    print('PASS: Neo-tree :edit; F7/F8 including zoom switches; Space tn new sessions including zoom; '
           'Alt-z; window navigation; Ctrl-k history; raw control keys; Space bb + Hop from editor and terminal zoom; '+str(artifacts))
 finally:
     (artifacts/'screen.log').write_bytes(output)

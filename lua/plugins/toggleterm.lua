@@ -14,22 +14,47 @@ return {
           opts.mappings.n[lhs:gsub("^<Leader>t", "<Leader>T")] = mapping
           opts.mappings.n[lhs] = false
         end
+        opts.mappings.n["<Leader>t"] = { desc = "Терминалы и панели" }
       end,
     },
   },
   keys = {
     {
-      "<M-t>",
+      "<Leader>tn",
       function() require("terminal_sessions").new() end,
-      mode = { "n", "i", "t" },
+      mode = "n",
       desc = "Новая сессия терминала в той же панели",
     },
     {
-      "<Leader>t",
-      '<Cmd>execute v:count . "ToggleTerm"<CR>',
+      "<Leader>tt",
+      function() require("toggleterm").toggle() end,
       mode = "n",
-      nowait = true,
       desc = "Показать / скрыть терминал",
+    },
+    {
+      "<Leader>th",
+      function() require("terminal_actions").split "horizontal" end,
+      desc = "Горизонтальный сплит текущей панели",
+    },
+    {
+      "<Leader>tv",
+      function() require("terminal_actions").split "vertical" end,
+      desc = "Вертикальный сплит текущей панели",
+    },
+    {
+      "<Leader>tc",
+      function() require("terminal_actions").close_current() end,
+      desc = "Закрыть текущую сессию / панель",
+    },
+    {
+      "<Leader>tC",
+      function() require("terminal_actions").close_all(true) end,
+      desc = "Закрыть остальные терминалы",
+    },
+    {
+      "<Leader>tq",
+      function() require("terminal_actions").close_all(false) end,
+      desc = "Закрыть все терминалы",
     },
     {
       "<F8>",

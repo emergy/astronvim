@@ -63,18 +63,19 @@ def closed():
 try:
     pump(1.5)
     termux = lua('require("user_platform").mobile') == 'true'
-    assert lua('vim.fn.maparg("<Space>t","n",false,true).nowait') == '1'
+    assert lua('vim.fn.maparg("<Space>t","n")') == ''
+    assert lua('vim.fn.maparg("<Space>tt","n") ~= ""') == 'true'
     assert lua('vim.fn.maparg("<Space>Tf","n") ~= ""') == 'true'
-    key(b' t'); opened(termux)
+    key(b' tt'); opened(termux)
     for _ in range(3):
         key(b'\x1b[18~'); closed()
         key(b'\x1b[18~'); value=opened(termux)
         assert value['count'] == 1 and value['alive'] == 1, value
-    print('PASS Space t opens; F7 hides/reopens, restores layout and preserves one session')
-    key(b'\x1b[1;6D'); key(b' t'); closed()
-    key(b' t'); opened(termux, normal=not termux)
+    print('PASS Space tt opens; F7 hides/reopens, restores layout and preserves one session')
+    key(b'\x1b[1;6D'); key(b' tt'); closed()
+    key(b' tt'); opened(termux, normal=not termux)
     if not termux: key(b'i')
-    print('PASS Space t also hides from terminal Normal mode')
+    print('PASS Space tt also hides from terminal Normal mode')
     if termux:
         key(b'\x1b[1;6A'); opened(False)
         key(b'\x1b[18~'); closed()
@@ -88,6 +89,17 @@ try:
     key(b'\x1b[18~'); value=opened(termux)
     assert value['count']==2 and value['open']==1, value
     print('PASS F8 switches/reselects with zoom and without extra splits or sessions')
+    for suffix, count, opened_count in ((b'h',3,2),(b'v',4,3),(b'n',5,3)):
+        key(b'\x1b[1;6D t'+suffix)
+        value=state()
+        assert value['count']==count and value['open']==opened_count and value['alive']==count,value
+    key(b'\x1b[1;6D tc');value=state()
+    assert value['count']==4 and value['open']==3 and value['alive']==4,value
+    key(b'\x1b[1;6D tC');value=opened(termux,normal=True)
+    assert value['count']==1 and value['alive']==1,value
+    key(b'\x1b[1;6D tq');closed();value=state()
+    assert value['count']==0 and value['alive']==0,value
+    print('PASS Space th/tv/tn/tc/tC/tq with real key input; all editor windows retained')
     print('PASS profile:', 'mobile auto-zoom' if termux else 'Linux split unchanged')
 finally:
     try: lua('vim.schedule(function() vim.cmd("qa!") end)')
