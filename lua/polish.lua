@@ -52,3 +52,5 @@ require("buffer_mouse").setup()
 require("terminal_keys").setup()
 
 require("window_roles").setup()
+
+require("file_watch").setup()
