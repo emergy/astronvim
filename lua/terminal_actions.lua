@@ -1,5 +1,14 @@
 local M = {}
 
+function M.devcontainer()
+  local term = require("terminal_sessions").new { dir = vim.fn.getcwd() }
+  -- d-c может быть функцией .bashrc, поэтому команда идёт в новую
+  -- интерактивную оболочку, а не запускается как отдельный бинарник.
+  -- Terminal:send фокусирует исходный split и закрывает копию Snacks Zoom.
+  vim.api.nvim_chan_send(term.job_id, "d-c up" .. term.newline_chr)
+  return term
+end
+
 local function current()
   local buf = vim.api.nvim_get_current_buf()
   for _, term in ipairs(require("toggleterm.terminal").get_all(true)) do

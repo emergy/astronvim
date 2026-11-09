@@ -89,6 +89,13 @@ try:
     key(b'\x1b[18~'); value=opened(termux)
     assert value['count']==2 and value['open']==1, value
     print('PASS F8 switches/reselects with zoom and without extra splits or sessions')
+    for sequence, expected in ((b' 1',1),(b' t]',2),(b' t]',1),(b' t[',2),(b' tT',2)):
+        key(b'\x1b[1;6D'+sequence)
+        try:value=opened(termux)
+        except AssertionError as error:raise AssertionError(repr(sequence)+': '+str(error)) from error
+        target=next(term for term in value['detail'] if term['id']==expected)
+        assert value['buf']==target['buf'] and value['count']==2,value
+    print('PASS Space 1, t[/t] cycle, tT menu alias with real keys')
     for suffix, count, opened_count in ((b'h',3,2),(b'v',4,3),(b'n',5,3)):
         key(b'\x1b[1;6D t'+suffix)
         value=state()

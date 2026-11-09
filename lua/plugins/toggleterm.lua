@@ -18,54 +18,93 @@ return {
       end,
     },
   },
-  keys = {
-    {
-      "<Leader>tn",
-      function() require("terminal_sessions").new() end,
-      mode = "n",
-      desc = "Новая сессия терминала в той же панели",
-    },
-    {
-      "<Leader>tt",
-      function() require("toggleterm").toggle() end,
-      mode = "n",
-      desc = "Показать / скрыть терминал",
-    },
-    {
-      "<Leader>th",
-      function() require("terminal_actions").split "horizontal" end,
-      desc = "Горизонтальный сплит текущей панели",
-    },
-    {
-      "<Leader>tv",
-      function() require("terminal_actions").split "vertical" end,
-      desc = "Вертикальный сплит текущей панели",
-    },
-    {
-      "<Leader>tc",
-      function() require("terminal_actions").close_current() end,
-      desc = "Закрыть текущую сессию / панель",
-    },
-    {
-      "<Leader>tC",
-      function() require("terminal_actions").close_all(true) end,
-      desc = "Закрыть остальные терминалы",
-    },
-    {
-      "<Leader>tq",
-      function() require("terminal_actions").close_all(false) end,
-      desc = "Закрыть все терминалы",
-    },
-    {
-      "<F8>",
-      function()
-        vim.cmd.stopinsert()
-        vim.schedule(function() require("terminal_sessions").select() end)
-      end,
-      mode = { "n", "i", "t" },
-      desc = "Select terminal or open horizontal terminal",
-    },
-  },
+  keys = function()
+    local keys = {
+      {
+        "<Leader>tT",
+        function()
+          vim.schedule(function() require("terminal_sessions").select() end)
+        end,
+        desc = "Выбрать терминал (F8)",
+      },
+      {
+        "<Leader>t[",
+        function()
+          vim.schedule(function() require("terminal_sessions").cycle(-1) end)
+        end,
+        desc = "Предыдущий терминал",
+      },
+      {
+        "<Leader>t]",
+        function()
+          vim.schedule(function() require("terminal_sessions").cycle(1) end)
+        end,
+        desc = "Следующий терминал",
+      },
+      {
+        "<Leader>td",
+        function() require("terminal_actions").devcontainer() end,
+        desc = "Devcontainer: d-c up в новой сессии",
+      },
+      {
+        "<Leader>tn",
+        function() require("terminal_sessions").new() end,
+        mode = "n",
+        desc = "Новая сессия терминала в той же панели",
+      },
+      {
+        "<Leader>tt",
+        function() require("toggleterm").toggle() end,
+        mode = "n",
+        desc = "Показать / скрыть терминал",
+      },
+      {
+        "<Leader>th",
+        function() require("terminal_actions").split "horizontal" end,
+        desc = "Горизонтальный сплит текущей панели",
+      },
+      {
+        "<Leader>tv",
+        function() require("terminal_actions").split "vertical" end,
+        desc = "Вертикальный сплит текущей панели",
+      },
+      {
+        "<Leader>tc",
+        function() require("terminal_actions").close_current() end,
+        desc = "Закрыть текущую сессию / панель",
+      },
+      {
+        "<Leader>tC",
+        function() require("terminal_actions").close_all(true) end,
+        desc = "Закрыть остальные терминалы",
+      },
+      {
+        "<Leader>tq",
+        function() require("terminal_actions").close_all(false) end,
+        desc = "Закрыть все терминалы",
+      },
+      {
+        "<F8>",
+        function()
+          vim.cmd.stopinsert()
+          vim.schedule(function() require("terminal_sessions").select() end)
+        end,
+        mode = { "n", "i", "t" },
+        desc = "Select terminal or open horizontal terminal",
+      },
+    }
+    for digit = 0, 9 do
+      local id = digit == 0 and 10 or digit
+      keys[#keys + 1] = {
+        "<Leader>" .. digit,
+        function()
+          vim.schedule(function() require("terminal_sessions").by_id(id) end)
+        end,
+        desc = "Терминал №" .. id,
+      }
+    end
+    return keys
+  end,
   opts = function(_, opts)
     opts.size = 20
     opts.auto_scroll = false

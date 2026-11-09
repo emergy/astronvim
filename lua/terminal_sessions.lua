@@ -127,9 +127,33 @@ function M.activate(term, options)
   return vim.api.nvim_get_current_win()
 end
 
-function M.new()
+function M.by_id(id)
+  local term = require("toggleterm.terminal").get(id)
+  if not term then
+    vim.notify(("Терминал №%d не открыт"):format(id), vim.log.levels.INFO)
+    return
+  end
+  return M.activate(term)
+end
+
+function M.cycle(step)
+  local all = require("toggleterm.terminal").get_all()
+  if #all == 0 then
+    vim.notify("Нет открытых терминалов", vim.log.levels.INFO)
+    return
+  end
+  table.sort(all, function(a, b) return a.id < b.id end)
+  local previous = slot() or require("toggleterm.terminal").get_last_focused()
+  for index, term in ipairs(all) do
+    if term == previous then return M.activate(all[(index - 1 + step) % #all + 1]) end
+  end
+  return M.activate(step < 0 and all[#all] or all[1])
+end
+
+function M.new(options)
   local previous = slot()
-  local term = require("toggleterm.terminal").Terminal:new { direction = "horizontal" }
+  local term =
+    require("toggleterm.terminal").Terminal:new(vim.tbl_extend("force", { direction = "horizontal" }, options or {}))
   -- Не отправляем строку команды или управляющие клавиши работающей оболочке.
   M.activate(term, { slot = previous })
   return term
