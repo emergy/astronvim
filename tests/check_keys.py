@@ -56,7 +56,7 @@ vim.defer_fn(function()
     end
     local active
     for _,term in ipairs(all) do
-      if term:is_open() and term.window==vim.api.nvim_get_current_win() then active=term.id end
+      if term.bufnr==vim.api.nvim_get_current_buf() then active=term.id end
     end
     local trees,windows=0,0
     for _,win in ipairs(vim.api.nvim_list_wins()) do
@@ -66,7 +66,7 @@ vim.defer_fn(function()
     local zen=package.loaded['snacks.zen']
     local state={mode=vim.api.nvim_get_mode().mode,ft=vim.bo.filetype,
       file=vim.api.nvim_buf_get_name(0),window=vim.api.nvim_get_current_win(),
-      windows=windows,trees=trees,active=active,
+      windows=windows,trees=trees,active=active,count=#all,
       zoom=zen and zen.win and zen.win:valid() or false,
       lines=vim.api.nvim_buf_line_count(0),scrollback=vim.bo.scrollback,job=vim.b.terminal_job_id}
     vim.fn.writefile({vim.json.encode(state)},base..'/state.json')
@@ -131,6 +131,12 @@ try:
     assert first['window']==second['window'] and second['windows']==2, 'F8 must reuse split: '+repr((first,second))
     send(b'\x1bz')
     wait_for(lambda s: s['zoom'] and s['mode']=='t', 'Alt-z zoom from terminal mode')
+    for choose in (1, 2, 1, 2):
+        send(b'\x1b[19~')
+        wait_for(lambda s: s['ft']=='snacks_picker_input', 'F8 picker while zoomed')
+        send((b'\x1b[B' if choose==2 else b'')+b'\r')
+        wait_for(lambda s: s['zoom'] and s.get('active')==choose and s['windows']==2 and s['mode']=='t',
+                 'F8 must preserve zoom and one terminal split')
     send(b'\x1bz')
     wait_for(lambda s: not s['zoom'] and s.get('active')==2 and s['mode']=='t', 'Alt-z restores terminal')
     end=time.monotonic()+5
@@ -167,12 +173,28 @@ try:
     assert key_file.exists(), 'Neo-tree Hop labels appear'
     send(key_file.read_text().strip().encode())
     wait_for(lambda s: s['file'].endswith('file-2.txt') and s['trees']==0, 'Space bb opens file and hides tree')
+    send(b'\x1bt')  # Alt+t: new session, existing terminal panel is reused
+    wait_for(lambda s: s.get('active')==3 and s['count']==3 and s['windows']==2 and s['mode']=='t',
+             'Alt-t creates a new session in the existing panel')
+    send(b'\x1bz\x1bt')
+    wait_for(lambda s: s.get('active')==4 and s['count']==4 and s['windows']==2 and s['zoom'] and s['mode']=='t',
+             'Alt-t creates a new session while preserving zoom')
+    hint_time = key_file.stat().st_mtime_ns
+    send(b'\x1b[1;6D bb')  # Terminal Normal mode, then the existing buffer menu
+    end=time.monotonic()+8
+    while key_file.stat().st_mtime_ns==hint_time and time.monotonic()<end:
+        drain()
+    assert key_file.stat().st_mtime_ns!=hint_time, 'buffer hints from zoomed terminal'
+    send(key_file.read_text().strip().encode())
+    wait_for(lambda s: s['file'].endswith('file-2.txt') and s['mode']=='n' and not s['zoom'] and s['windows']==2,
+             'Space bb from terminal zoom must open the file in the editor')
     send(b':qa!\r')
     end=time.monotonic()+5
     while process.poll() is None and time.monotonic()<end:
         drain()
     assert process.poll()==0, 'clean Neovim exit'
-    print('PASS: :edit existing file from Neo-tree, real F7/F8 session switching, Alt-z from terminal, Ctrl-Shift-j/k, Alt-Up/Down, Ctrl-k history clear, raw Ctrl-h/j/l passthrough, Space bb + Hop; '+str(artifacts))
+    print('PASS: Neo-tree :edit; F7/F8 including zoom switches; Alt-t new sessions including zoom; '
+          'Alt-z; window navigation; Ctrl-k history; raw control keys; Space bb + Hop from editor and terminal zoom; '+str(artifacts))
 finally:
     (artifacts/'screen.log').write_bytes(output)
     if process.poll() is None:

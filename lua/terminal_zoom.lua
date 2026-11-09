@@ -1,6 +1,25 @@
 local M = {}
 local configured = false
 
+-- Snacks показывает копию буфера; владельцем сессии остаётся обычный split.
+function M.window(term)
+  local zen = package.loaded["snacks.zen"]
+  local zoom = zen and zen.win and zen.win:valid() and zen.win.win
+  local fallback
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    if win ~= zoom and vim.api.nvim_win_get_buf(win) == term.bufnr then
+      if vim.api.nvim_win_get_config(win).relative == "" then return win end
+      fallback = fallback or win
+    end
+  end
+  return fallback
+end
+
+function M.active(buf)
+  local zen = package.loaded["snacks.zen"]
+  return zen and zen.win and zen.win:valid() and (not buf or zen.win.buf == buf) or false
+end
+
 function M.close(term)
   local zen = package.loaded["snacks.zen"]
   if zen and zen.win and zen.win:valid() and zen.win.buf == term.bufnr then zen.zoom() end
@@ -25,6 +44,7 @@ end
 function M.setup(opts)
   local on_open, on_close = opts.on_open, opts.on_close
   opts.on_open = function(term)
+    require("window_roles").claim(term.window, "terminal", term.bufnr)
     if on_open then on_open(term) end
     M.open(term)
   end
@@ -37,12 +57,15 @@ function M.setup(opts)
   -- Snacks показывает буфер ещё и в плавающем окне. ToggleTerm должен сохранять
   -- одну сессию, иначе повторное открытие создаёт лишние сплиты для того же ID.
   local ui = require "toggleterm.ui"
+  local winbar = ui.winbar
+  ui.winbar = function(id) return winbar(id):gsub("v:lua%.___toggleterm_winbar_click", "v:lua.NvimTerminalSessionClick") end
   local find = ui.find_open_windows
   ui.find_open_windows = function(...)
     local _, windows = find(...)
     local filtered = {}
     for _, entry in ipairs(windows) do
       local term = require("toggleterm.terminal").get(entry.term_id)
+      if term then term.window = M.window(term) end
       if not term or entry.window == term.window then filtered[#filtered + 1] = entry end
     end
     return #filtered > 0, filtered

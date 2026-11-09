@@ -40,6 +40,7 @@ function M.refresh()
 end
 
 function M.setup()
+  _G.NvimTerminalSessionClick = M.click
   if M.timer then return end
   M.timer = assert((vim.uv or vim.loop).new_timer())
   M.timer:start(0, 750, vim.schedule_wrap(M.refresh))
@@ -52,25 +53,97 @@ function M.setup()
   })
 end
 
+function M.click(id, _, button)
+  if button and button ~= "l" then return end
+  local term = require("toggleterm.terminal").get(id)
+  if not term then return end
+  local win = vim.fn.getmousepos().winid
+  if win > 0 and vim.api.nvim_win_is_valid(win) and vim.bo[vim.api.nvim_win_get_buf(win)].buftype == "terminal" then
+    vim.api.nvim_set_current_win(win)
+  end
+  return M.activate(term)
+end
+
+local function slot()
+  local buf = vim.api.nvim_get_current_buf()
+  local other
+  for _, term in ipairs(terminals()) do
+    term.window = require("terminal_zoom").window(term)
+    if term.window and vim.api.nvim_win_get_tabpage(term.window) == vim.api.nvim_get_current_tabpage() then
+      if term.bufnr == buf then return term end
+      if not term.hidden then other = other or term end
+    end
+  end
+  return other
+end
+
+local function start_input(term)
+  vim.cmd.startinsert()
+  vim.schedule(function()
+    if vim.api.nvim_get_current_buf() == term.bufnr then vim.cmd.startinsert() end
+  end)
+end
+
+-- Единственный путь для F8, таббара и создания сессии. Zoom не владеет PTY.
+function M.activate(term, options)
+  options = options or {}
+  local zoom = require "terminal_zoom"
+  local previous = options.slot or slot()
+  local zoomed = options.zoomed or (previous and zoom.active(previous.bufnr))
+  term.window = zoom.window(term)
+  if term.bufnr and zoom.active(term.bufnr) then
+    vim.api.nvim_set_current_win(require("snacks").zen.win.win)
+    start_input(term)
+    return vim.api.nvim_get_current_win()
+  end
+  if zoom.active() then require("snacks").zen.zoom() end
+  if term.window then
+    vim.api.nvim_set_current_win(term.window)
+  else
+    local target = previous and zoom.window(previous)
+    if target then
+      term.direction = previous.direction
+      if not term.bufnr or not vim.api.nvim_buf_is_valid(term.bufnr) then term:spawn() end
+      for _, old in ipairs(require("toggleterm.terminal").get_all(true)) do
+        if old.window == target then old.window = nil end
+      end
+      term.window = target
+      require("window_roles").claim(target, "terminal", term.bufnr)
+      vim.api.nvim_set_current_win(target)
+      vim.api.nvim_win_set_buf(target, term.bufnr)
+      term:__set_options()
+      require("toggleterm.ui").set_winbar(term)
+      if term.on_open then term:on_open() end
+    else
+      term:open(nil, "horizontal")
+    end
+  end
+  if zoomed and not require("user_platform").mobile then
+    require("snacks").zen.zoom { zoom = { win = { height = 0 } } }
+  else
+    zoom.open(term)
+  end
+  start_input(term)
+  return vim.api.nvim_get_current_win()
+end
+
+function M.new()
+  local previous = slot()
+  local term = require("toggleterm.terminal").Terminal:new { direction = "horizontal" }
+  -- Не отправляем строку команды или управляющие клавиши работающей оболочке.
+  M.activate(term, { slot = previous })
+  return term
+end
+
 function M.select()
   M.refresh()
   local terminals = require("toggleterm.terminal").get_all()
   if #terminals == 0 then
-    vim.cmd "ToggleTerm direction=horizontal"
+    M.new()
     return
   end
-
-  local window = vim.api.nvim_get_current_win()
-  local slot
-  for _, term in ipairs(terminals) do
-    if term:is_open() then
-      if term.window == window then
-        slot = term
-        break
-      end
-      slot = slot or term
-    end
-  end
+  local previous = slot()
+  local zoomed = previous and require("terminal_zoom").active(previous.bufnr)
 
   local width = 0
   for _, term in ipairs(terminals) do
@@ -91,26 +164,7 @@ function M.select()
     format_item = M.label,
   }, function(term)
     if not term then return end
-    if slot and require("user_platform").mobile then require("terminal_zoom").close(slot) end
-    if term:is_open() then
-      term:focus()
-    elseif slot and slot:is_open() then
-      -- Reuse the terminal window instead of asking ToggleTerm to create a split.
-      local target_window = slot.window
-      term.direction = slot.direction
-      if not term.bufnr or not vim.api.nvim_buf_is_valid(term.bufnr) then term:spawn() end
-      vim.api.nvim_set_current_win(target_window)
-      slot.window = nil
-      term.window = target_window
-      vim.api.nvim_win_set_buf(target_window, term.bufnr)
-      term:__set_options()
-      require("toggleterm.ui").set_winbar(term)
-      if term.on_open then term:on_open() end
-    else
-      term:open(nil, "horizontal")
-    end
-    require("terminal_zoom").open(term)
-    vim.cmd.startinsert()
+    M.activate(term, { slot = previous, zoomed = zoomed })
   end)
 end
 

@@ -19,6 +19,12 @@ return {
   },
   keys = {
     {
+      "<M-t>",
+      function() require("terminal_sessions").new() end,
+      mode = { "n", "i", "t" },
+      desc = "Новая сессия терминала в той же панели",
+    },
+    {
       "<Leader>t",
       '<Cmd>execute v:count . "ToggleTerm"<CR>',
       mode = "n",
@@ -38,7 +44,7 @@ return {
   opts = function(_, opts)
     opts.size = 20
     opts.auto_scroll = false
-    if require("user_platform").mobile then require("terminal_zoom").setup(opts) end
+    require("terminal_zoom").setup(opts)
     require("terminal_sessions").setup()
     opts.winbar = {
       enabled = true,

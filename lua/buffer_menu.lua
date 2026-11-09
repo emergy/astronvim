@@ -68,11 +68,6 @@ function M.open()
       local node = state.tree:get_node(target.cursor.row)
       selected = node and node.extra and node.extra.bufnr
     end)
-
-    if selected and vim.api.nvim_buf_is_valid(selected) then
-      vim.api.nvim_set_current_win(editor)
-      vim.api.nvim_win_set_buf(editor, selected)
-    end
   end)
 
   -- Restore the source and visibility even if picking was cancelled or failed.
@@ -89,6 +84,14 @@ function M.open()
     end
   end)
   command._last = last
+  if selected and vim.api.nvim_buf_is_valid(selected) then
+    local opened, open_err = pcall(function()
+      -- Открытие дерева могло закрыть исходное окно Snacks Zoom.
+      if vim.api.nvim_win_is_valid(editor) then vim.api.nvim_set_current_win(editor) end
+      editor = require("window_roles").open(selected)
+    end)
+    if not opened then ok, err = false, open_err end
+  end
   local focus = selected and editor or origin
   if vim.api.nvim_win_is_valid(focus) then vim.api.nvim_set_current_win(focus) end
   -- Neo-tree follows BufEnter with a 100 ms debounce; restore the view after it.

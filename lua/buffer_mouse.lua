@@ -27,14 +27,13 @@ end
 function M.patch_tabline(component)
   if type(component) ~= "table" then return end
   local click = component.on_click
-  if type(click) == "table" and click.name == "heirline_tabline_buffer_callback" and not click.middle_close then
-    click.middle_close = true
-    local original = click.callback
+  if type(click) == "table" and click.name == "heirline_tabline_buffer_callback" and not click.panel_routing then
+    click.panel_routing = true
     click.callback = function(self, buf, clicks, button, mods)
       if button == "m" then
         M.close(buf)
       else
-        return original(self, buf, clicks, button, mods)
+        require("window_roles").open(buf)
       end
     end
   end

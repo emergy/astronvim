@@ -62,6 +62,31 @@ try:
  print('PASS modified buffer Cancel retains edits')
  lua('(function() vim.fn.confirm=function() return 2 end end)()');tabclick('delta.txt');st=state();assert 'delta.txt' not in st['bufs'],st
  print('PASS modified buffer explicit Discard closes')
+ lua('''(function()
+  _G.panel_first=require('terminal_sessions').new()
+  _G.panel_second=require('terminal_sessions').new()
+  require('snacks').zen.zoom({zoom={win={height=0}}})
+ end)()''');pump(.5)
+ tabclick('alpha.txt',0);st=state();assert st['current']=='alpha.txt',st
+ assert lua('vim.api.nvim_win_get_buf(panel_second.window)==panel_second.bufnr')=='true'
+ print('PASS actual tabbar file click from terminal zoom keeps the terminal panel')
+ lua('''(function()
+  require('terminal_sessions').activate(panel_second)
+ end)()''');pump(.5)
+ def terminal_state():
+  return json.loads(lua('''vim.json.encode({buf=vim.api.nvim_get_current_buf(),
+    first=panel_first.bufnr,second=panel_second.bufnr,zoom=require('terminal_zoom').active(),
+    x=vim.fn.getwininfo(vim.api.nvim_get_current_win())[1].wincol+2,
+    y=vim.fn.screenpos(0,vim.fn.line('w0'),1).row-1,
+    offset=vim.fn.strdisplaywidth(require('terminal_sessions').label(panel_first,true))+1,
+    splits=#vim.tbl_filter(function(w)return vim.api.nvim_win_get_config(w).relative=='' end,vim.api.nvim_list_wins())})'''))
+ st=terminal_state();click(st['x'],st['y'],0);after=terminal_state()
+ assert after['buf']==st['first'] and not after['zoom'] and after['splits']==st['splits'],(st,after)
+ click(after['x'],after['y'],0);again=terminal_state()
+ assert again['buf']==st['first'] and again['splits']==st['splits'] and not again['zoom'],again
+ click(again['x']+again['offset'],again['y'],0);after=terminal_state()
+ assert after['buf']==st['second'] and not after['zoom'] and after['splits']==st['splits'],after
+ print('PASS actual Winbar clicks switch/reselect sessions in one terminal panel')
 finally:
  try:lua('vim.schedule(function() vim.cmd("qa!") end)')
  except Exception:pass
