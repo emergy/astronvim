@@ -3,27 +3,27 @@
   <row>
     <key c="й" ne="1" se="loc esc" />
     <key c="ц" nw="~" ne="2" sw="\@" />
-    <key c="у" nw="!" ne="3" sw="\#" se="^e:ctrl,e" n="loc €" />
+    <key c="у" nw="!" ne="3" sw="\#" n="loc €" />
     <key c="к" ne="4" sw="$" />
     <key c="е" ne="5" sw="%" nw="ё" />
     <key c="н" ne="6" sw="^" split_before="true" />
     <key c="г" ne="7" sw="&amp;" />
     <key c="ш" ne="8" sw="*" />
-    <key c="щ" nw="^o:ctrl,o" ne="9" sw="(" se=")" />
+    <key c="щ" ne="9" sw="(" se=")" />
     <key c="з" ne="0" sw=":keyevent flags='small' symbol='F7':137" se=":keyevent flags='small' symbol='F8':138" />
     <key c="х" sw="[" se="]" />
   </row>
   <row>
-    <key c="ф" ne="`" s="tab" />
-    <key c="ы" nw="tool:session.previous:‹" ne="tool:session.next:›" sw="loc ß" />
+    <key c="ф" ne="`" sw="tab" />
+    <key c="ы" nw="tool:session.previous:‹" ne="tool:session.next:›" sw="tool:session.new:+" />
     <key c="в" ne="^d:ctrl,d" />
     <key c="а" ne="-" sw="_" />
     <key c="п" ne="=" sw="+" />
     <key c="р" sw="&lt;" se="&gt;" split_before="true" />
-    <key c="о" sw="{" se="}" />
-    <key c="л" sw="[" se="]" />
-    <key c="д" ne="|" sw="\\" />
-    <key c="ж" ne="=" sw="+" />
+    <key c="о" sw="{" se="}" ne="&quot;" />
+    <key c="л" sw="[" se="]" ne="'" />
+    <key c="д" />
+    <key c="ж" />
     <key c="э" ne="|" sw="\\" />
   </row>
   <row scale="11">
@@ -35,8 +35,8 @@
     <key c="и" ne="\?" sw="/" split_before="true" />
     <key c="т" ne=";" />
     <key c="ь" ne=":" />
-    <key c="б" ne="'" se="," />
-    <key c="ю" ne="&quot;" se="." />
+    <key c="б" se="," />
+    <key c="ю" se="." />
     <key width="1.22" role="action" c="backspace" ne="delete" />
   </row>
   <row height="0.95">

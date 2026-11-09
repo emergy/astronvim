@@ -3,24 +3,24 @@
   <row>
     <key c="q" ne="1" se="loc esc" />
     <key c="w" nw="~" ne="2" sw="\@" />
-    <key c="e" nw="!" ne="3" sw="\#" se="^e:ctrl,e" n="loc €" />
+    <key c="e" nw="!" ne="3" sw="\#" n="loc €" />
     <key c="r" ne="4" sw="$" />
     <key c="t" ne="5" sw="%" />
     <key c="y" split_before="true" ne="6" sw="^" />
     <key c="u" ne="7" sw="&amp;" />
     <key c="i" ne="8" sw="*" />
-    <key c="o" ne="9" sw="(" se=")" nw="^o:ctrl,o" />
+    <key c="o" ne="9" sw="(" se=")" />
     <key c="p" ne="0" sw=":keyevent flags='small' symbol='F7':137" se=":keyevent flags='small' symbol='F8':138" />
   </row>
   <row>
-    <key shift="0.5" c="a" ne="`" s="tab" />
-    <key c="s" ne="tool:session.next:›" sw="loc ß" nw="tool:session.previous:‹" />
+    <key shift="0.5" c="a" ne="`" sw="tab" />
+    <key c="s" ne="tool:session.next:›" sw="tool:session.new:+" nw="tool:session.previous:‹" />
     <key c="d" ne="^d:ctrl,d" />
     <key c="f" ne="-" sw="_" />
     <key c="g" ne="=" sw="+" />
     <key c="h" split_before="true" sw="&lt;" se="&gt;" />
-    <key c="j" sw="{" se="}" />
-    <key c="k" sw="[" se="]" />
+    <key c="j" sw="{" se="}" ne="&quot;" />
+    <key c="k" sw="[" se="]" ne="'" />
     <key c="l" ne="|" sw="\\" />
   </row>
   <row>
@@ -31,7 +31,7 @@
     <key c="v" />
     <key c="b" split_before="true" ne="\?" sw="/" />
     <key c="n" ne=":" sw=";" />
-    <key c="m" ne="&quot;" nw="'" sw="," se="." />
+    <key c="m" sw="," se="." />
     <key width="1.5" c="backspace" ne="delete" />
   </row>
   <row height="0.95">

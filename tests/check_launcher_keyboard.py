@@ -10,7 +10,7 @@ en, ru = keys(latin), keys(russian)
 pairs = dict(zip("qwertyuiopasdfghjklzxcvbnm", "йцукенгшщзфывапролдячсмить"))
 slots = ("nw", "ne", "sw", "se", "n", "s", "w", "e")
 for source, target in pairs.items():
-    if target in ("т", "ь"):
+    if target in ("т", "ь", "д"):
         continue
     for slot in slots:
         if (source, slot) == ("t", "nw"):
@@ -35,13 +35,25 @@ en_fn = {key.get("a"): key.get("b") for key in latin.find("modmap")}
 ru_fn = {key.get("a"): key.get("b") for key in russian.find("modmap")}
 assert {pairs[key]: action for key, action in en_fn.items() if pairs[key] not in ("т", "ь", "б", "ю")} == ru_fn
 for char, gestures in {"т": {"ne": ";"}, "ь": {"ne": ":"},
-                       "б": {"ne": "'", "se": ","}, "ю": {"ne": chr(34), "se": "."}}.items():
+                       "б": {"se": ","}, "ю": {"se": "."}}.items():
     assert ru[char].attrib == {"c": char, **gestures}, char
     assert char not in ru_fn
 for key, slot, action in (("c", "ne", "^c:ctrl,c"), ("d", "ne", "^d:ctrl,d"),
-                          ("e", "se", "^e:ctrl,e"), ("o", "nw", "^o:ctrl,o"),
                           ("z", "ne", "⌥z:alt,z")):
     assert en[key].get(slot) == action
+for mapping, a, s, e, o, j, k in ((en, "a", "s", "e", "o", "j", "k"), (ru, "ф", "ы", "у", "щ", "о", "л")):
+    assert mapping[a].get("sw") == "tab" and mapping[a].get("s") is None
+    assert mapping[s].get("sw") == "tool:session.new:+"
+    assert mapping[s].get("nw") == "tool:session.previous:‹"
+    assert mapping[s].get("ne") == "tool:session.next:›"
+    assert mapping[e].get("se") is None and mapping[o].get("nw") is None
+    assert mapping[j].get("ne") == chr(34) and mapping[k].get("ne") == "'"
+    assert all(not value.endswith((":ctrl,e", ":ctrl,o")) for key in mapping.values() for value in key.attrib.values())
+assert en["m"].attrib == {"c": "m", "sw": ",", "se": "."}
+assert ru["ж"].attrib == {"c": "ж"} and ru["д"].attrib == {"c": "д"}
+assert en["l"].get("ne") == "|" and en["l"].get("sw") == "\\\\"
+assert ru["э"].get("ne") == "|" and ru["э"].get("sw") == "\\\\"
+assert ru["п"].get("ne") == "=" and ru["п"].get("sw") == "+"
 assert en["p"].get("sw") == ":keyevent flags='small' symbol='F7':137"
 assert en["p"].get("se") == ":keyevent flags='small' symbol='F8':138"
 print("PASS: both layouts, shared gestures/Fn actions, simplified Russian punctuation, four-way sliders and ё")
