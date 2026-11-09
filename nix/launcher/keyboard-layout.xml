@@ -14,7 +14,7 @@
   </row>
   <row>
     <key shift="0.5" c="a" ne="`" sw="tab" />
-    <key c="s" ne="tool:session.next:›" sw="tool:session.new:+" nw="tool:session.previous:‹" />
+    <key c="s" ne="tool:session.next:›" sw="tool:session.new:⁺" nw="tool:session.previous:‹" />
     <key c="d" ne="^d:ctrl,d" />
     <key c="f" ne="-" sw="_" />
     <key c="g" ne="=" sw="+" />

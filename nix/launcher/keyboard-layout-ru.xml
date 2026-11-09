@@ -15,7 +15,7 @@
   </row>
   <row>
     <key c="ф" ne="`" sw="tab" />
-    <key c="ы" nw="tool:session.previous:‹" ne="tool:session.next:›" sw="tool:session.new:+" />
+    <key c="ы" nw="tool:session.previous:‹" ne="tool:session.next:›" sw="tool:session.new:⁺" />
     <key c="в" ne="^d:ctrl,d" />
     <key c="а" ne="-" sw="_" />
     <key c="п" ne="=" sw="+" />

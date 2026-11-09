@@ -43,7 +43,7 @@ for key, slot, action in (("c", "ne", "^c:ctrl,c"), ("d", "ne", "^d:ctrl,d"),
     assert en[key].get(slot) == action
 for mapping, a, s, e, o, j, k in ((en, "a", "s", "e", "o", "j", "k"), (ru, "ф", "ы", "у", "щ", "о", "л")):
     assert mapping[a].get("sw") == "tab" and mapping[a].get("s") is None
-    assert mapping[s].get("sw") == "tool:session.new:+"
+    assert mapping[s].get("sw") == "tool:session.new:⁺"
     assert mapping[s].get("nw") == "tool:session.previous:‹"
     assert mapping[s].get("ne") == "tool:session.next:›"
     assert mapping[e].get("se") is None and mapping[o].get("nw") is None
