@@ -1,0 +1,2 @@
+# Пустая контекстная строка unified diff содержит обязательный пробел-маркер.
+nix/launcher/*.patch whitespace=-blank-at-eol
