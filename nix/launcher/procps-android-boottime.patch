@@ -1,0 +1,49 @@
+--- a/src/ps/output.c
++++ b/src/ps/output.c
+@@ -100,10 +100,23 @@
+     static unsigned int boot_time = 0;
+     struct stat_info *stat_info = NULL;
+     if (boot_time == 0) {
+-        if (procps_stat_new(&stat_info) < 0)
+-             errx(EXIT_FAILURE, _("Unable to get system boot time"));
+-        boot_time = STAT_GET(stat_info, STAT_SYS_TIME_OF_BOOT, ul_int);
+-        procps_stat_unref(&stat_info);
++        if (procps_stat_new(&stat_info) >= 0) {
++            boot_time = STAT_GET(stat_info, STAT_SYS_TIME_OF_BOOT, ul_int);
++            procps_stat_unref(&stat_info);
++        }
++        /* В Android PRoot /proc/stat может быть заглушкой btime 0. */
++        if (boot_time == 0) {
++            struct timespec realtime, uptime;
++            time_t value;
++            if (clock_gettime(CLOCK_REALTIME, &realtime) < 0 ||
++                clock_gettime(CLOCK_BOOTTIME, &uptime) < 0)
++                errx(EXIT_FAILURE, _("Unable to get system boot time"));
++            value = realtime.tv_sec - uptime.tv_sec -
++                (realtime.tv_nsec < uptime.tv_nsec);
++            if (value <= 0 || value > UINT_MAX)
++                errx(EXIT_FAILURE, _("Unable to get system boot time"));
++            boot_time = (unsigned int)value;
++        }
+     }
+     return boot_time;
+ }
+--- a/library/uptime.c
++++ b/library/uptime.c
+@@ -141,6 +141,16 @@
+     uselocale(LC_GLOBAL_LOCALE);
+     freelocale(tmplocale);
+ 
++    /* CLOCK_BOOTTIME доступен, даже когда PRoot подменяет uptime нулями. */
++    if (up <= 0) {
++        struct timespec uptime;
++        if (clock_gettime(CLOCK_BOOTTIME, &uptime) == 0) {
++            up = uptime.tv_sec + uptime.tv_nsec * 1.0e-9;
++            if (rc < 2)
++                rc = 2;
++        }
++    }
++
+     if (uptime_secs)
+         *uptime_secs = up;
+     if (idle_secs)

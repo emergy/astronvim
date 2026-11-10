@@ -9,6 +9,7 @@
     let
       system = "aarch64-linux";
       pkgs = import nixpkgs { inherit system; };
+      procpsAndroid = pkgs.callPackage ./procps-android.nix {};
       termuxAm = pkgs.callPackage (nix-on-droid-src + "/pkgs/android-integration/termux-am.nix") {};
       termuxTools = pkgs.callPackage (nix-on-droid-src + "/pkgs/android-integration/termux-tools.nix") {
         termux-am = termuxAm;
@@ -56,13 +57,14 @@
       };
     in {
       packages.${system} = {
+        procps-android = procpsAndroid;
         inherit invi nterm;
         default = pkgs.buildEnv {
           name = "nix-launcher-workstation";
           paths = with pkgs; [
             (neovim.override { vimAlias = true; viAlias = true; })
             git openssh curl wget coreutils findutils gnugrep gnused gawk
-            gnutar gzip bzip2 xz unzip zip file procps util-linux which
+            gnutar gzip bzip2 xz unzip zip file procpsAndroid util-linux which
             gcc gnumake pkg-config tree-sitter
             ripgrep fd fzf jq yq-go less bat tree lazygit bash-completion
             python3 ansible ansible-lint nodejs
