@@ -61,18 +61,40 @@ return {
   --     end,
   --   })
   -- end,
-  opts = {
-    -- :edit из дерева временно закрывает окно файла при перенаправлении буфера.
-    -- Автовыход в этот момент завершает Neovim до повторного открытия файла.
-    close_if_last_window = false,
-    default_component_configs = { icon = { provider = vault_icon } },
-    filesystem = {
-      filtered_items = {
-        visible = true,
-        hide_dotfiles = false,
+  opts = function(_, opts)
+    opts = vim.tbl_deep_extend("force", opts, {
+      -- :edit из дерева временно закрывает окно файла при перенаправлении буфера.
+      -- Автовыход в этот момент завершает Neovim до повторного открытия файла.
+      close_if_last_window = false,
+      default_component_configs = { icon = { provider = vault_icon } },
+      filesystem = {
+        filtered_items = {
+          visible = true,
+          hide_dotfiles = false,
+        },
       },
-    },
-  },
+    })
+    opts.event_handlers = opts.event_handlers or {}
+    table.insert(opts.event_handlers, {
+      id = "user_neotree_root_key",
+      event = "after_render",
+      handler = function(state)
+        if state.name ~= "filesystem" then return end
+        local mapping = state.resolved_mappings and state.resolved_mappings["."]
+        if not mapping or not vim.api.nvim_buf_is_valid(state.bufnr) then return end
+        -- Русский дубль / -> . не должен перекрывать явное назначение точки.
+        local langmapper = package.loaded.langmapper
+        local set = langmapper and langmapper.original_buf_set_keymap or vim.api.nvim_buf_set_keymap
+        set(state.bufnr, "n", ".", "", {
+          callback = mapping.handler,
+          desc = mapping.text,
+          noremap = true,
+          silent = true,
+        })
+      end,
+    })
+    return opts
+  end,
   dependencies = {
     "smoka7/hop.nvim",
   },
