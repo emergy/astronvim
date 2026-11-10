@@ -1,0 +1,43 @@
+# Только интерактивные Bash-сессии nterm. Вложенные shell не наследуют интеграцию.
+__nterm_token=$NTERM_TOKEN
+__nterm_command_file=$NTERM_COMMAND_FILE
+__nterm_edit_file=$NTERM_EDIT_FILE
+unset NTERM_TOKEN NTERM_COMMAND_FILE NTERM_EDIT_FILE
+if [[ -r ${NTERM_USER_BASHRC:-$HOME/.bashrc} ]]; then
+  . "${NTERM_USER_BASHRC:-$HOME/.bashrc}"
+fi
+unset NTERM_USER_BASHRC
+
+__nterm_ready() {
+  local nterm_status=$?
+  builtin printf '\033]777;nterm;ready;%s\007' "$__nterm_token"
+  return "$nterm_status"
+}
+__nterm_request_edit() {
+  local nterm_status=$?
+  (umask 077; printf '%s' "$READLINE_LINE" > "$__nterm_edit_file")
+  printf '\033]777;nterm;edit;%s\007' "$__nterm_token"
+  return "$nterm_status"
+}
+__nterm_load_command() {
+  local nterm_status=$? nterm_command='' LC_ALL=C
+  if [[ -r $__nterm_command_file ]]; then
+    IFS= read -r -d '' nterm_command < "$__nterm_command_file" || :
+  fi
+  READLINE_LINE=$nterm_command
+  READLINE_POINT=${#READLINE_LINE}
+  return "$nterm_status"
+}
+for __nterm_map in emacs-standard vi-insertion vi-command; do
+  bind -m "$__nterm_map" -x '"\C-x\C-e":__nterm_request_edit'
+  bind -m "$__nterm_map" -x '"\C-x\C-^":__nterm_load_command'
+  bind -m "$__nterm_map" '"\C-x\C-]":"\C-x\C-^\C-m"'
+done
+unset __nterm_map
+PS0=$'\e]777;nterm;busy;'"$__nterm_token"$'\a'${PS0-}
+PS2=$'\e]777;nterm;busy;'"$__nterm_token"$'\a'${PS2-'> '}
+if [[ $(declare -p PROMPT_COMMAND 2>/dev/null) == 'declare -a '* ]]; then
+  PROMPT_COMMAND+=(__nterm_ready)
+else
+  PROMPT_COMMAND=("${PROMPT_COMMAND-}" __nterm_ready)
+fi

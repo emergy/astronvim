@@ -14,6 +14,11 @@
         termux-am = termuxAm;
       };
       startSshd = pkgs.writeShellScriptBin "start-sshd" (builtins.readFile ./start-sshd);
+      nterm = pkgs.writeShellScriptBin "nterm" ''
+        nterm_config="''${XDG_CONFIG_HOME:-$HOME/.config}"
+        nterm_root="''${NTERM_CONFIG_DIR:-$nterm_config/nvim}"
+        exec "$nterm_root/scripts/nterm" "$@"
+      '';
       setupStorage = pkgs.writeShellScriptBin "setup-storage" (builtins.readFile ./setup-storage.sh);
       androidDns = pkgs.writeScriptBin "android-dns" (
         "#!${pkgs.python3}/bin/python3\n" + builtins.readFile ./dns-bridge/android_dns.py
@@ -51,7 +56,7 @@
       };
     in {
       packages.${system} = {
-        inherit invi;
+        inherit invi nterm;
         default = pkgs.buildEnv {
           name = "nix-launcher-workstation";
           paths = with pkgs; [
@@ -66,7 +71,7 @@
             vscode-langservers-extracted helm-ls marksman stylua shfmt
             tmux bubblewrap
             kubectl kubernetes-helm k9s argocd rclone vifm mc gh terraform-ls shellcheck
-            codex invi startSshd setupStorage androidDns
+            codex invi nterm startSshd setupStorage androidDns
             termuxAm termuxTools.open termuxTools.open_url termuxTools.xdg_open
             termuxTools.reload_settings termuxTools.setup_storage
             termuxTools.wake_lock termuxTools.wake_unlock

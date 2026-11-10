@@ -99,6 +99,15 @@ list:
 
 ## Терминалы
 
+- Лёгкий самостоятельный режим: `scripts/nterm`, `terminal/init.lua`,
+  `lua/terminal_profile.lua`, `terminal/bashrc`. Вход через `g:nterm_mode`
+  находится до Lazy в init. Обычный профиль и вложенный `nvim` сохраняются.
+  Один внешний префикс Ctrl+Space; остальные terminal-mode сочетания проходят
+  внутрь, включая Ctrl+\ Ctrl+n. Выполнение черновика идёт через Readline того
+  же Bash только при его prompt, с сохранением context/history. Не подменять
+  это запуском отдельного shell или отправкой текста занятой SSH/Vim-сессии.
+  Описание: `docs/nterm.md`; настоящий PTY-тест: `tests/check_nterm.py`.
+
 - Переходы между окнами в Normal и Terminal: Ctrl+Shift+H/J/K/L,
   с дублями Alt+стрелки.
   Обычные Ctrl+H/J/L не перехватываются глобально; Ctrl+J / LF должен

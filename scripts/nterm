@@ -1,0 +1,27 @@
+#!/bin/sh
+# Лёгкий терминальный профиль; обычная команда nvim сохраняет полную сборку.
+set -eu
+nterm_root=${NTERM_CONFIG_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}/nvim}
+if [ ! -f "$nterm_root/terminal/init.lua" ]; then
+  nterm_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+fi
+if [ "${1:-}" = "--help" ]; then
+  cat <<'HELP'
+nterm [--cwd КАТАЛОГ] [параметры Neovim]
+Лёгкий терминал без AstroNvim. Ctrl+Space — внешний Normal mode.
+Space ? — справка; i — ввод; Space tn — вкладка; Space th/tv — split.
+Space j — Hop; / — поиск; v/V и y — выделение и копирование.
+Space e — редактировать выделение/строку; :wq — выполнить, :q! — отменить.
+HELP
+  exit 0
+fi
+if [ "${1:-}" = "--cwd" ]; then
+  [ "$#" -ge 2 ] || { echo 'nterm: укажите каталог после --cwd' >&2; exit 2; }
+  CDPATH= cd -- "$2"
+  shift 2
+fi
+if [ ! -r "$nterm_root/terminal/init.lua" ]; then
+  echo "nterm: не найден $nterm_root/terminal/init.lua" >&2
+  exit 1
+fi
+exec nvim --noplugin -i NONE -u "$nterm_root/terminal/init.lua" "$@"

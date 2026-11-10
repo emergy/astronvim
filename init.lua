@@ -1,5 +1,9 @@
 -- This file simply bootstraps the installation of Lazy.nvim and then calls other files for execution
 -- This file doesn't necessarily need to be touched, BE CAUTIOUS editing this file and proceed at your own risk.
+if vim.g.nterm_mode then
+  require("terminal_profile").setup()
+  return
+end
 require("user_platform").setup_path()
 require("ansible_vault").setup()
 local lazypath = vim.env.LAZY or vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
