@@ -69,7 +69,7 @@ vim.fn.writefile(
   rc
 )
 require("toggleterm.config").set { shell = "bash --noprofile --rcfile " .. vim.fn.shellescape(rc) .. " -i" }
-vim.cmd.lcd(scratch)
+vim.cmd.tcd(scratch)
 local dev = require("terminal_actions").devcontainer()
 assert(
   vim.wait(

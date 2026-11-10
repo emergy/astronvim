@@ -108,6 +108,8 @@ return {
   opts = function(_, opts)
     opts.size = 20
     opts.auto_scroll = false
+    opts.autochdir = false
+    require("terminal_directory").setup()
     require("terminal_zoom").setup(opts)
     require("terminal_sessions").setup()
     opts.winbar = {
