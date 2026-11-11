@@ -1,6 +1,14 @@
 ---@type LazySpec
 return {
   "folke/snacks.nvim",
+  opts = {
+    picker = {
+      actions = {
+        toggle_help_input = function(picker) require("keymap_help").toggle(picker.input.win) end,
+        toggle_help_list = function(picker) require("keymap_help").toggle(picker.list.win) end,
+      },
+    },
+  },
   keys = function()
     local keys = {
       {
