@@ -106,6 +106,8 @@ kubectl (также для `k`), Helm, Argo CD и Codex; Git/SSH дополня�
 bash-completion. Промпт: `user@host:каталог (ветка)$`, без поиска новых файлов.
 
 Сохранены `vim`, `bashrc`, `sshc`, `s`, `ll`, `la`, `lt`, `a`, `keys`;
+`cr` запускает Codex на `wsl` через SSH с терминалом и интерактивным login Bash,
+чтобы загрузить PATH (включая nvm); аргументы передаются без потери кавычек.
 `gg` запускает lazygit. `bashrc` редактирует файл и перечитывает его только
 после успешного выхода редактора. `keys` открывает XML клавиатуры Launcher.
 Android-пути Perl/OpenSSL и старый `dsync` для Termux `.local` не переносятся:

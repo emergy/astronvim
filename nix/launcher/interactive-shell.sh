@@ -4,6 +4,14 @@ alias vim=nvim
 alias bashrc='nvim "$HOME/.bashrc" && . "$HOME/.bashrc"'
 alias sshc='nvim "$HOME/.ssh/config"'
 alias gg=lazygit
+
+# Интерактивный Bash загружает PATH WSL; SSH выделяет терминал для Codex.
+unalias cr 2>/dev/null || true
+cr() {
+  local remote_command
+  printf -v remote_command '%q ' bash -lic 'exec codex -s danger-full-access "$@"' -- "$@"
+  ssh -t wsl "$remote_command"
+}
 alias s='invi --config "$HOME/.config/invi/config.js"'
 alias ll='ls -l'
 alias la='ls -la'
