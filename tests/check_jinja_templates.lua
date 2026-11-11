@@ -1,11 +1,11 @@
--- nvim --headless -u NONE -i NONE -l tests/check_yaml_jinja.lua
+-- nvim --headless -u NONE -i NONE -l tests/check_jinja_templates.lua
 local root = vim.fn.getcwd()
 vim.opt.rtp:prepend(root)
 vim.opt.rtp:append(root .. "/after")
 for _, name in ipairs { "ansible-vim", "nvim-treesitter" } do
   vim.opt.rtp:append(vim.fn.stdpath "data" .. "/lazy/" .. name)
 end
-local spec = dofile(root .. "/lua/plugins/yaml_jinja.lua")
+local spec = dofile(root .. "/lua/plugins/jinja_templates.lua")
 vim.filetype.add(spec[1].opts.filetypes)
 spec[2].init()
 local opts = { highlight = { enable = true, disable = { "vim" } }, auto_install = false, ensure_installed = {} }
@@ -41,11 +41,38 @@ for _, name in ipairs { ".gitlab-ci.yml.j2", "config.yaml.j2", "roles/demo/templ
   assert(groups(6).jinjaComment, name .. ": Jinja comments")
   assert(not vim.treesitter.highlighter.active[vim.api.nvim_get_current_buf()], "YAML parser masked Jinja")
 end
+sample = {
+  'source "qemu" "vm" {',
+  '  image = "{{ image | lower }}"',
+  "{% if enabled %}",
+  "  cpus = 2",
+  "{% endif %}",
+  "{# comment #}",
+  "}",
+}
+for _, name in ipairs { "image.pkrtpl.hcl.j2", "ubuntu.pkr.hcl.j2", "vars.hcl.j2" } do
+  vim.cmd.enew { bang = true }
+  vim.api.nvim_buf_set_name(0, root .. "/.tmp/jinja-fixture/" .. name)
+  vim.api.nvim_exec_autocmds("BufNewFile", { buffer = 0 })
+  vim.api.nvim_buf_set_lines(0, 0, -1, false, sample)
+  assert(vim.bo.filetype == "hcl.jinja2", name .. ": filetype " .. vim.bo.filetype)
+  assert(groups(1).hclBlockType, name .. ": HCL block highlighting")
+  assert(groups(4).hclAttributeName and groups(4).hclValueDec, name .. ": HCL attributes/numbers")
+  assert(groups(2).jinjaVariable and groups(2).jinjaFilter, name .. ": Jinja expressions/filters")
+  assert(groups(3).jinjaStatement and groups(5).jinjaStatement, name .. ": Jinja control blocks")
+  assert(groups(6).jinjaComment, name .. ": Jinja comments")
+  assert(not vim.treesitter.highlighter.active[vim.api.nvim_get_current_buf()], "HCL parser masked Jinja")
+end
 vim.cmd.enew { bang = true }
 vim.api.nvim_buf_set_name(0, root .. "/.tmp/yaml-jinja-fixture/plain.yml")
 vim.api.nvim_exec_autocmds("BufNewFile", { buffer = 0 })
 assert(vim.bo.filetype == "yaml", "plain YAML filetype changed")
 assert(not opts.highlight.disable("yaml", 0), "plain YAML Tree-sitter disabled")
+vim.api.nvim_buf_set_name(0, root .. "/.tmp/jinja-fixture/plain.pkr.hcl")
+vim.bo.filetype = ""
+vim.api.nvim_exec_autocmds("BufNewFile", { buffer = 0 })
+assert(vim.bo.filetype == "hcl", "plain HCL filetype changed")
+assert(not opts.highlight.disable("hcl", 0), "plain HCL Tree-sitter disabled")
 assert(opts.highlight.disable("vim", 0), "existing Tree-sitter exclusion lost")
 vim.api.nvim_buf_set_name(0, root .. "/.tmp/yaml-jinja-fixture/plain.txt.j2")
 vim.bo.filetype = ""
@@ -55,4 +82,4 @@ local inherited = function(lang) return lang == "lua" end
 local other = { highlight = { disable = inherited } }
 spec[3].opts(nil, other)
 assert(other.highlight.disable("lua", 0) and not other.highlight.disable("yaml", 0), "disable callback lost")
-print "PASS: YAML/Jinja filetypes, keys/numbers, expressions/filters, control blocks/comments; ordinary files preserved"
+print "PASS: YAML/HCL with Jinja, keys/attributes/numbers, expressions/filters, blocks/comments; ordinary files preserved"
