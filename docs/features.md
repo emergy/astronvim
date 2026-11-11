@@ -53,3 +53,15 @@ nvim --headless -u NONE -i NONE -l tests/check_jinja_templates.lua
 Проверки охватывают соседние языки, явный выбор и запасное поведение,
 границы блоков, Jinja и редактирование меток. Результаты по версиям и платформам
 для общего обработчика: `.reports/embedded-blocks.json`.
+
+## Команды оболочки
+
+| ID | Возможность и ожидаемое поведение | Состояние | Настройка и проверка |
+|---|---|---|---|
+| ENV-COMP-001 | Tab для `devcontainer` дополняет команды, вложенные подкоманды, флаги, значения и локальные пути. Список берётся из CLI. | Включено в Bash WSL | [Дополнение CLI](devcontainer-completion.md), `completions/devcontainer.bash`; `bash tests/check_devcontainer_completion.bash` |
+
+Зависимости ENV-COMP-001: Bash, bash-completion, Node.js и Dev Containers CLI
+в PATH. Проверено в WSL с CLI 0.90.0; другие оболочки и устройства не
+проверялись и этим изменением не настраивались. Сочетание — Tab в Readline.
+Коммит, путь установленного дополнения и результат —
+`.operation-manifests/devcontainer-completion.json`.
