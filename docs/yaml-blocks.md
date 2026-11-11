@@ -46,11 +46,15 @@ Jinja внутри встроенного языка. Добавление, из
 - `queries/yaml/injections.scm` — инъекции Tree-sitter. Сохраняет штатные
   правила закреплённого nvim-treesitter; при обновлении плагина сверять их
   с upstream.
-- `lua/yaml_blocks.lua` — границы инъекций и подключение Vim syntax только
+- `lua/embedded_blocks.lua` — общий с HCL обработчик границ инъекций и Vim syntax только
   для языков, чьи метки встречаются в буфере. Изменения отслеживаются через
   `on_lines`, без постоянного таймера или фонового процесса.
-- `after/syntax/yaml.lua`, `syntax/yaml_block_include.vim` — подключение
+- `after/syntax/yaml.lua`, `syntax/embedded_block_include.vim` — подключение
   вложенной подсветки и Jinja в одной области syntax.
+
+`lua/yaml_blocks.lua` и `syntax/yaml_block_include.vim` оставлены для
+совместимости с уже загруженными обработчиками до перезапуска редактора.
+Для HCL heredoc доступна [аналогичная подсветка](hcl-blocks.md).
 
 ```sh
 nvim --headless -u NONE -i NONE -l tests/check_yaml_blocks.lua

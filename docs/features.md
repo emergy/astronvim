@@ -32,3 +32,24 @@ nvim --headless -u NONE -i NONE -l tests/check_picker_help.lua
 `?`. Проверить отсутствие русских дублей и `LM (`; повторное `?` должно закрыть
 справку. Проверить, что русские привязки поиска продолжают работать.
 Автотест не заменяет проверку фактического ввода с русской раскладкой в GUI.
+
+## Вложенная подсветка
+
+| ID | Возможность и ожидаемое поведение | Состояние | Настройка и проверка |
+|---|---|---|---|
+| NVIM-EMBED-001 | Метка `\| # sh`, `>- # py` и аналогичные варианты выбирают язык тела YAML-скаляра. Явная метка важнее имени ключа; границы и Jinja сохраняются. | Включено | [YAML-блоки](yaml-blocks.md), `lua/embedded_blocks.lua`, `queries/yaml/injections.scm`; `tests/check_yaml_blocks.lua` |
+| NVIM-EMBED-002 | `/* yaml */ <<-EOT` выбирает язык HCL heredoc. Комментарий важнее имени маркера; после завершения возвращается HCL-подсветка. Работает и в HCL + Jinja. | Включено | [HCL-блоки](hcl-blocks.md), `lua/embedded_blocks.lua`, `queries/hcl/injections.scm`; `tests/check_hcl_blocks.lua` |
+
+Область: все поддерживаемые профили. Зависимости: доступный runtime syntax
+или установленный парсер языка; Jinja — установленный ansible-vim.
+Новых сочетаний клавиш нет. Команды проверок:
+
+```sh
+nvim --headless -u NONE -i NONE -l tests/check_yaml_blocks.lua
+nvim --headless -u NONE -i NONE -l tests/check_hcl_blocks.lua
+nvim --headless -u NONE -i NONE -l tests/check_jinja_templates.lua
+```
+
+Проверки охватывают соседние языки, явный выбор и запасное поведение,
+границы блоков, Jinja и редактирование меток. Результаты по версиям и платформам
+для общего обработчика: `.reports/embedded-blocks.json`.

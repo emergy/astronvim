@@ -1,1 +1,1 @@
-require("yaml_blocks").syntax()
+require("embedded_blocks").syntax "yaml"
