@@ -1,4 +1,5 @@
 # Только интерактивные Bash-сессии nterm. Вложенные shell не наследуют интеграцию.
+export NTERM_ACTIVE=1
 __nterm_token=$NTERM_TOKEN
 __nterm_command_file=$NTERM_COMMAND_FILE
 __nterm_edit_file=$NTERM_EDIT_FILE

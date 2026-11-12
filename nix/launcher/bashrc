@@ -11,3 +11,6 @@ fi
 start-sshd
 
 . "$HOME/.config/workstation/interactive-shell.sh"
+if [ -r "$HOME/.config/nvim/terminal/autostart.bash" ]; then
+  . "$HOME/.config/nvim/terminal/autostart.bash"
+fi

@@ -26,6 +26,7 @@ base = Path(tempfile.mkdtemp(prefix="nterm-test-", dir=scratch))
 (base / "config/nvim").symlink_to(root, target_is_directory=True)
 rc = base / "bashrc"
 rc.write_text("PS1='ROOT> '\nHISTCONTROL=\nHISTIGNORE=\nshopt -s histappend lithist\n"
+              ". " + shlex.quote(str(root / 'terminal/autostart.bash')) + "\n"
               "fixture_func() { printf 'FUNCTION_OK\\n'; }\n"
               "fixture_prompt() { return $?; }\nPROMPT_COMMAND=(fixture_prompt)\nHISTFILE=" + shlex.quote(str(base / "bash_history")) + "\n")
 sock = str(base / "nvim.sock")

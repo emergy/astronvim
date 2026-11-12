@@ -24,4 +24,5 @@ if [ ! -r "$nterm_root/terminal/init.lua" ]; then
   echo "nterm: не найден $nterm_root/terminal/init.lua" >&2
   exit 1
 fi
+export NTERM_ACTIVE=1
 exec nvim --noplugin -i NONE -u "$nterm_root/terminal/init.lua" "$@"

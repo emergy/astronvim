@@ -58,6 +58,21 @@ nvim --headless -u NONE -i NONE -l tests/check_jinja_templates.lua
 
 ### Интеграция Bash в Nterm
 
+`NTERM-AUTO-001`: автозапуск Nterm в каждой новой сессии телефона через
+`terminal/autostart.bash`; декларативная точка подключения —
+`nix/launcher/bashrc`, нативный Termux — подключение из его `.bashrc`.
+После выхода доступен Bash. SSH, вложенные оболочки, Neovim, tmux/screen,
+неинтерактивный запуск и отсутствие TTY исключены. `NTERM_AUTOSTART=0`
+отключает автозапуск. Зависимости: Bash и команда `nterm` в PATH.
+Платформы включения: нативный Termux и Nix-on-Droid / Launcher; WSL/Linux
+используется для изолированной проверки, в его `.bashrc` включение не добавляется.
+Сочетаний клавиш и переводов русской раскладки эта возможность не меняет.
+Автотест: `python3 tests/check_nterm_autostart.py`; интеграция с настоящим
+профилем — `python3 tests/check_nterm.py`. Ручной сценарий: создать две
+новые сессии приложения, в каждой увидеть Nterm; закрыть его и получить Bash;
+подключиться по SSH и получить Bash. Физический интерфейс приложения
+автотестом не проверяется. Результаты: `.reports/nterm-autostart.json`.
+
 `NTERM-BASH-001`: включена в лёгком профиле `nterm`. Настройка
 `terminal/bashrc` устанавливает обработчики редактирования и выполнения
 команды в Readline-картах `emacs-standard`, `vi-insert`, `vi-command`
