@@ -28,7 +28,7 @@ __nterm_load_command() {
   READLINE_POINT=${#READLINE_LINE}
   return "$nterm_status"
 }
-for __nterm_map in emacs-standard vi-insertion vi-command; do
+for __nterm_map in emacs-standard vi-insert vi-command; do
   bind -m "$__nterm_map" -x '"\C-x\C-e":__nterm_request_edit'
   bind -m "$__nterm_map" -x '"\C-x\C-^":__nterm_load_command'
   bind -m "$__nterm_map" '"\C-x\C-]":"\C-x\C-^\C-m"'

@@ -22,6 +22,8 @@ scratch = Path(os.environ.get("TMPDIR", str(root / ".tmp")))
 scratch.mkdir(parents=True, exist_ok=True)
 base = Path(tempfile.mkdtemp(prefix="nterm-test-", dir=scratch))
 (base / "tmp").mkdir()
+(base / "config").mkdir()
+(base / "config/nvim").symlink_to(root, target_is_directory=True)
 rc = base / "bashrc"
 rc.write_text("PS1='ROOT> '\nHISTCONTROL=\nHISTIGNORE=\nshopt -s histappend lithist\n"
               "fixture_func() { printf 'FUNCTION_OK\\n'; }\n"
@@ -29,6 +31,7 @@ rc.write_text("PS1='ROOT> '\nHISTCONTROL=\nHISTIGNORE=\nshopt -s histappend lith
 sock = str(base / "nvim.sock")
 env = {**os.environ, "TERM": "xterm-256color", "NTERM_CONFIG_DIR": str(root),
        "NTERM_USER_BASHRC": str(rc), "XDG_STATE_HOME": str(base / "state"),
+       "XDG_CONFIG_HOME": str(base / "config"),
        "XDG_CACHE_HOME": str(base / "cache"), "TMPDIR": str(base / "tmp")}
 env.pop("TMUX", None)
 master, slave = pty.openpty()
@@ -85,6 +88,10 @@ def draft(text):
 try:
     initial = wait_for(lambda s: s["current_ready"] and s["mode"] == "t", "first Bash prompt", 15)
     assert initial["session_count"] == initial["tabs"] == 1 and not initial["lazy"] and not initial["toggle"] and not initial["hop"]
+    assert 'invalid keymap name' not in '\n'.join(initial['output']), initial['output']
+    command("""for nterm_map in emacs-standard vi-insert vi-command; do nterm_bindings=$(bind -m "$nterm_map" -X); if [[ $nterm_bindings == *__nterm_request_edit* && $nterm_bindings == *__nterm_load_command* ]]; then printf 'READLINE_MAP_OK=%s\\n' "$nterm_map"; fi; done""")
+    wait_for(lambda s: s['ready'] and all('READLINE_MAP_OK=' + name in s['output']
+             for name in ('emacs-standard', 'vi-insert', 'vi-command')), 'Readline maps installed')
     lua("(function() _G.first_session=require('terminal_profile').current() end)()")
     ipc = Path(lua("first_session.command_file")).parent
     command("export NT_KEEP=kept; cd " + shlex.quote(str(base)) + "; printf 'CONTEXT_OK\\n'")

@@ -56,6 +56,26 @@ nvim --headless -u NONE -i NONE -l tests/check_jinja_templates.lua
 
 ## Команды оболочки
 
+### Интеграция Bash в Nterm
+
+`NTERM-BASH-001`: включена в лёгком профиле `nterm`. Настройка
+`terminal/bashrc` устанавливает обработчики редактирования и выполнения
+команды в Readline-картах `emacs-standard`, `vi-insert`, `vi-command`
+без ошибок при запуске. Описание: [Nterm](nterm.md).
+Платформы: WSL/Linux, нативный Termux и Nix-on-Droid; зависимости — Bash,
+Neovim и установленный профиль. macOS этой проверкой не охвачена.
+Раскладка не влияет на управляющие байты: `Ctrl+x Ctrl+e` вызывает редактор
+текущей команды у локального Bash prompt; во вложенном приложении сочетание
+проходит внутрь. Внутренние Readline-последовательности выполнения черновика
+описаны в `terminal/bashrc`, отдельных пользовательских клавиш не добавлено.
+
+Проверка: `python3 tests/check_nterm.py` — настоящий PTY, отсутствие ошибки
+`invalid keymap name`, обработчики в трёх картах, редактирование команды,
+выполнение в том же Bash и прохождение клавиш во вложенный Neovim.
+Это не проверка физической мобильной клавиатуры или её жестов.
+Результаты исправления: `.reports/nterm-readline-fix-wsl.log`,
+`.reports/nterm-readline-fix-termux.log`, `.reports/nterm-readline-fix-nix.log`.
+
 | ID | Возможность и ожидаемое поведение | Состояние | Настройка и проверка |
 |---|---|---|---|
 | ENV-COMP-001 | Tab для `devcontainer` дополняет команды, вложенные подкоманды, флаги, значения и локальные пути. Список берётся из CLI. | Включено в Bash WSL | [Дополнение CLI](devcontainer-completion.md), `completions/devcontainer.bash`; `bash tests/check_devcontainer_completion.bash` |
