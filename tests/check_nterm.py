@@ -184,8 +184,22 @@ try:
     assert value["lines"] == ["printf SELECTED_OK"], value
     command(":q!")
     wait_for(lambda s: not s["draft"] and s["mode"] == "t", "cancel visual editor")
-    send(b"\0yy")
-    pump(.15)
+    send(b"\0")
+    wait_for(lambda s: s["mode"] in ("n", "nt"), "copy selection mode")
+    highlighted = lua("""(function()
+      _G.nterm_yank_marks = function()
+        local count=0
+        for _,mark in ipairs(vim.api.nvim_buf_get_extmarks(0,-1,0,-1,{details=true})) do
+          if mark[4].hl_group=='IncSearch' then count=count+1 end
+        end
+        return count
+      end
+      vim.cmd('normal! yy')
+      return nterm_yank_marks()
+    end)()""")
+    assert int(highlighted) > 0, "copied text was not highlighted"
+    pump(.25)
+    assert lua("nterm_yank_marks()") == "0", "copy highlight did not expire"
     assert b"\x1b]52;" in output, "OSC52 clipboard was not emitted"
     send(b" j")
     wait_for(lambda s: s["hop"], "Hop lazy load")
@@ -206,7 +220,7 @@ try:
     assert process.poll() == 0
     assert not ipc.exists(), "IPC directory leaked"
     assert "edited_%s" in (base / "bash_history").read_text(), "edited command missing from Bash history"
-    print("PASS: minimal boot; same Bash/history; edit/cancel/busy guard; Readline Ctrl-X Ctrl-E; raw forwarding; nested Vim; selection; OSC52; Hop; tabs/splits; cleanup")
+    print("PASS: minimal boot; same Bash/history; edit/cancel/busy guard; Readline Ctrl-X Ctrl-E; raw forwarding; nested Vim; selection; OSC52 and transient yank highlight; Hop; tabs/splits; cleanup")
 finally:
     (base / "screen.log").write_bytes(output)
     if process.poll() is None:

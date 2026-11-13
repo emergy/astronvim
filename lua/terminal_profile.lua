@@ -332,6 +332,7 @@ function M.setup()
   api.nvim_create_autocmd("TextYankPost", {
     group = group,
     callback = function()
+      (vim.hl or vim.highlight).on_yank()
       local event = vim.v.event
       if event.operator == "y" and event.regname ~= "+" and event.regname ~= "*" then
         vim.fn.setreg("+", event.regcontents, event.regtype)
