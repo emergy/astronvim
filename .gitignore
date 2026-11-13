@@ -1,5 +1,7 @@
-/.tmp/
-/.backups/
-/.reports/
-/.operation-manifests/
+.tmp/
+.backups/
+.reports/
+.operation-manifests/
 __pycache__/
+.agents
+.codex-attachments/db1fe60d-18d1-4497-93d0-f17a6f300862/797ec114-2ef3-4fdc-82e2-3deaa4d3a7fb
