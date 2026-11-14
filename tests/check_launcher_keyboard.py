@@ -20,7 +20,8 @@ for source, target in pairs.items():
 assert set("йцукенгшщзхфывапролджэячсмитьбю") <= ru.keys()
 for layout, mapping in ((latin, en), (russian, ru)):
     assert layout.get("bottom_row") == "false"
-    assert mapping["shift"].get("sw") == "switch_backward"
+    assert mapping["shift"].get("sw") == "loc switch_clipboard"
+    assert mapping["ctrl"].get("sw") == "switch_backward"
     assert mapping["ctrl"].get("ne") == "tool:app.command_palette:󱎱"
     assert mapping["ctrl"].get("n") == "loc meta"
     for slot, direction in (("w", "left"), ("e", "right"), ("n", "up"), ("s", "down")):

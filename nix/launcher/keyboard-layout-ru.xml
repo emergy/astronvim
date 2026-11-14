@@ -27,7 +27,7 @@
     <key c="э" ne="|" sw="\\" />
   </row>
   <row scale="11">
-    <key width="1.22" role="action" c="shift" ne="loc capslock" sw="switch_backward" />
+    <key width="1.22" role="action" c="shift" ne="loc capslock" sw="loc switch_clipboard" />
     <key c="я" ne="⌥z:alt,z" />
     <key c="ч" ne="loc †" />
     <key c="с" ne="^c:ctrl,c" />
@@ -40,7 +40,7 @@
     <key width="1.22" role="action" c="backspace" ne="delete" />
   </row>
   <row height="0.95">
-    <key width="1.7" c="ctrl" ne="tool:app.command_palette:󱎱" sw="loc switch_clipboard" se="switch_numeric" n="loc meta" />
+    <key width="1.7" c="ctrl" ne="tool:app.command_palette:󱎱" sw="switch_backward" se="switch_numeric" n="loc meta" />
     <key width="1.3" c="loc alt" nw="fn" ne="loc change_method" se="config" />
     <key width="5.5" c="space" split_at="2.5" w="cursor_left" e="cursor_right" s="cursor_down" n="cursor_up" nw="tool:window.previous:󰜳" ne="tool:window.next:󰜶" sw="tool:session.previous:󰜹" se="tool:session.next:󰜰" />
     <key width="1.3" c="loc compose" nw="home" ne="page_up" sw="page_down" se="end" w="left" e="right" n="up" s="down" />
