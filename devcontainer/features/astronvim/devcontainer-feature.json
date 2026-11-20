@@ -1,0 +1,41 @@
+{
+  "id": "astronvim",
+  "version": "1.0.0",
+  "name": "Neovim with emergy/AstroNvim configuration",
+  "description": "Install Neovim and the configuration bundled from this repository commit.",
+  "options": {
+    "version": {
+      "type": "string",
+      "default": "0.11.5",
+      "proposals": [
+        "0.11.5",
+        "stable"
+      ],
+      "description": "Neovim release: an exact version with optional v prefix, or stable."
+    },
+    "nodeVersion": {
+      "type": "string",
+      "default": "22",
+      "description": "Node.js major or exact release, at least 22."
+    },
+    "treeSitterVersion": {
+      "type": "string",
+      "default": "0.26.1",
+      "description": "Exact Tree-sitter CLI release. Installed from GitHub, not npm."
+    },
+    "installPythonTools": {
+      "type": "boolean",
+      "default": true,
+      "description": "Install pynvim, black, isort, yamllint, ansible-core and ansible-lint in an isolated venv."
+    },
+    "installPlugins": {
+      "type": "boolean",
+      "default": true,
+      "description": "Run Lazy restore during first configuration setup, respecting lazy-lock.json."
+    }
+  },
+  "installsAfter": [
+    "ghcr.io/devcontainers/features/common-utils"
+  ],
+  "onCreateCommand": "/usr/local/bin/astronvim-setup"
+}

@@ -10,6 +10,8 @@
 
 [Реестр возможностей и регрессионных проверок](docs/features.md).
 
+[Dev Container Feature: Neovim, этот конфиг, CI и GHCR](docs/devcontainer-feature.md).
+
 | Сочетание | Действие |
 |---|---|
 | `Пробел e` | Дерево файлов |

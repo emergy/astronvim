@@ -1,0 +1,89 @@
+name: Dev Container Feature
+
+on:
+  push:
+    branches: [v5, feat/devcontainer-feature]
+  pull_request:
+    branches: [v5]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: devcontainer-feature-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FEATURE_VERSION: 1.0.${{ github.run_number }}
+
+jobs:
+  test:
+    name: Test (${{ matrix.platform }})
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: ubuntu-amd64
+            runner: ubuntu-24.04
+            image: ubuntu:24.04
+          - platform: ubuntu-arm64
+            runner: ubuntu-24.04-arm
+            image: ubuntu:24.04
+          - platform: el10-amd64
+            runner: ubuntu-24.04
+            image: quay.io/centos/centos:stream10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Unit tests and script syntax
+        run: |
+          python3 -m unittest discover -s tests/devcontainer_feature -v
+          bash -n devcontainer/features/astronvim/install.sh
+      - name: Bundle config from this commit
+        run: |
+          python3 scripts/package_devcontainer_feature.py \
+            --version "$FEATURE_VERSION" --output .tmp/feature-src
+      - name: Build feature test image
+        env:
+          BASE_IMAGE: ${{ matrix.image }}
+        run: |
+          docker info >/dev/null
+          docker build --progress=plain \
+            -f tests/devcontainer_feature/Dockerfile \
+            --build-arg BASE_IMAGE="$BASE_IMAGE" \
+            -t astronvim-feature-test .tmp/feature-src/astronvim
+      - name: Check lifecycle as the remote user
+        run: docker run --rm astronvim-feature-test
+
+  publish:
+    name: Publish to GHCR
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/v5' && github.repository == 'emergy/astronvim'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Bundle the tested config
+        run: |
+          python3 scripts/package_devcontainer_feature.py \
+            --version "$FEATURE_VERSION" --output .tmp/feature-src
+      - name: Publish OCI feature
+        uses: devcontainers/action@bef2cf2d1a019b00b45e184f83035e01bd1972f3 # v1
+        with:
+          publish-features: "true"
+          base-path-to-features: .tmp/feature-src
+          oci-registry: ghcr.io
+          features-namespace: emergy/astronvim
+          generate-docs: "false"
+          disable-repo-tagging: "true"
+          devcontainer-cli-version: 0.90.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

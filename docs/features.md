@@ -1,5 +1,21 @@
 # Реестр возможностей и проверок
 
+## Dev Container Feature
+
+`NVIM-DEVCONTAINER-001`: CI собирает OCI Feature с Neovim и точным Git-снимком
+runtime-конфига, проверяет lifecycle и публикует успешный `v5` в
+`ghcr.io/emergy/astronvim/astronvim:1`. Конфиг ставится от remote user;
+существующий конфиг и локальные правки сохраняются. Состояние: реализовано;
+успешная публикация подтверждается конкретным Actions run.
+Настройка: `.github/workflows/devcontainer-feature.yml`, `devcontainer/features/astronvim`,
+`scripts/package_devcontainer_feature.py`; описание — [CI и GHCR](devcontainer-feature.md).
+Платформы: Linux glibc amd64/arm64 в контейнере, хост WSL/Linux/macOS.
+Зависимости: Docker, GitHub Actions, GHCR и системные пакеты из README feature.
+Новых клавиш/переводов раскладки нет. Автотесты:
+`python3 -m unittest discover -s tests/devcontainer_feature -v`; Docker-команды
+приведены в документации. Smoke не загружает пользовательский init и не ставит
+плагины. UI и ARM64 требуют отдельного результата проверки.
+
 Реестр наполняется по мере инвентаризации и изменений. Ниже перечислены
 возможности, для которых уже оформлена запись; это пока не полный список сборки.
 Описание профилей: [универсальная конфигурация](universal.md).
