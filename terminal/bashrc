@@ -11,6 +11,7 @@ unset NTERM_USER_BASHRC
 
 __nterm_ready() {
   local nterm_status=$?
+  builtin printf '\033]777;nterm;cwd;%s;%s\007' "$__nterm_token" "$PWD"
   builtin printf '\033]777;nterm;ready;%s\007' "$__nterm_token"
   return "$nterm_status"
 }

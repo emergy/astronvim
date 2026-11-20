@@ -20,7 +20,7 @@ if "/com.termux/" in os.environ.get("PREFIX", ""):
 root = Path(__file__).resolve().parents[1]
 scratch = Path(os.environ.get("TMPDIR", str(root / ".tmp")))
 scratch.mkdir(parents=True, exist_ok=True)
-base = Path(tempfile.mkdtemp(prefix="nterm-test-", dir=scratch))
+base = Path(tempfile.mkdtemp(prefix="nterm-test-", dir=scratch)).resolve()
 (base / "tmp").mkdir()
 (base / "config").mkdir()
 (base / "config/nvim").symlink_to(root, target_is_directory=True)

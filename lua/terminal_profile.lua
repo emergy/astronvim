@@ -345,10 +345,16 @@ function M.setup()
       local session = M.sessions[args.buf]
       if not session then return end
       local value = args.data.sequence:gsub("\7$", ""):gsub("\27\\$", "")
+      local cwd_prefix = "\27]777;nterm;cwd;" .. session.token .. ";"
       if value == "\27]777;nterm;ready;" .. session.token then
         session.ready = true
         cwd(session)
         vim.cmd.redrawtabline()
+      elseif value:sub(1, #cwd_prefix) == cwd_prefix then
+        local path = value:sub(#cwd_prefix + 1)
+        if path:sub(1, 1) == "/" and not path:find("[%z\1-\31\127]") and vim.fn.isdirectory(path) == 1 then
+          session.cwd = path
+        end
       elseif value == "\27]777;nterm;busy;" .. session.token then
         session.ready = false
       elseif value == "\27]777;nterm;edit;" .. session.token then
