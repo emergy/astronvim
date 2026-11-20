@@ -27,14 +27,20 @@ return {
     diagnostics = { signs = true, underline = true, update_in_insert = false },
     -- passed to `vim.filetype.add`
     filetypes = {
+      pattern = {
+        ["devcontainer.*%.json"] = "json5",
+        ["devsr.*%.json"] = "json5",
+        [".*/.?devcontainer.*/.*%.json"] = "json5",
+        [".*/.?devsr.*/.*%.json"] = "json5",
+      },
       -- see `:h vim.filetype.add` for usage
-      extension = {
-        foo = "fooscript",
-      },
-      filename = {
-        -- ["Foofile"] = "fooscript",
-        ["devcontainer.json"] = "json5",
-      },
+      -- extension = {
+      --   foo = "fooscript",
+      -- },
+      -- filename = {
+      --   -- ["Foofile"] = "fooscript",
+      --   ["devcontainer.json"] = "json5",
+      -- },
       -- pattern = {
       --   -- [".*/etc/foo/.*"] = "fooscript",
       --   [".*%.yml"] = "yaml.ansible", -- .yml файлы будут определяться как Ansible
